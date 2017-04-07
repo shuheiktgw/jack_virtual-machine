@@ -21,7 +21,7 @@ class Translator
 
     private
 
-    
+
 
   end
 end

@@ -36,7 +36,7 @@ class Parser
     elsif (m = current_command.match(/^(\w+);(\w+)$/))
       parse_c_only_jmp(m[1], m[2])
     else
-      raise InvalidCommandError "The line does not match any types of command: #{current_command}"
+      raise InvalidCommandError, "The line does not match any types of command: #{current_command}"
     end
   end
 
