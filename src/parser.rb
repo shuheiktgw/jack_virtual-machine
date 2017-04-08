@@ -64,10 +64,12 @@ class Parser
     self.command_type = COMMAND_TYPE[:c_command]
     self.dest = translator.translate_dest(dest)
     self.comp = translator.translate_comp(comp)
+    self.jump = translator.translate_jump(nil)
   end
 
   def parse_c_only_jump(comp, jump)
     self.command_type = COMMAND_TYPE[:c_command]
+    self.dest = translator.translate_dest(nil)
     self.comp = translator.translate_comp(comp)
     self.jump = translator.translate_jump(jump)
   end
