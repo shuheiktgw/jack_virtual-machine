@@ -24,6 +24,7 @@ class Translator
 
     def translate_comp(comp)
       raise InvalidCompError, 'Comp should exist.' if comp.nil?
+
       return '0101010' if comp == '0'
       return '0111111' if comp == '1'
       return '0111010' if comp == '-1'
@@ -32,7 +33,7 @@ class Translator
       return '1110000' if comp == 'M'
       return '0001101' if comp == '!D'
       return '0110001' if comp == '!A'
-      return '1110001' if comp == '!D'
+      return '1110001' if comp == '!M'
       return '0001111' if comp == '-D'
       return '0110011' if comp == '-A'
       return '1110011' if comp == '-M'
@@ -65,6 +66,7 @@ class Translator
         return '101' if jump == JUMP[:jne]
         return '110' if jump == JUMP[:jle]
         return '111' if jump == JUMP[:jmp]
+
         raise InvalidJumpError, "#{jump} is invalid form for jump assembly"
     end
 
@@ -88,9 +90,6 @@ class Translator
   end
 end
 
-class InvalidDestinationError < StandardError;
-end
-class InvalidJumpError < StandardError;
-end
-class InvalidCompError < StandardError;
-end
+class InvalidDestinationError < StandardError; end
+class InvalidJumpError < StandardError; end
+class InvalidCompError < StandardError; end

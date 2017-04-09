@@ -129,4 +129,201 @@ describe 'Translator' do
       end
     end
   end
+
+  describe '#translate_comp' do
+    context 'if comp == nil' do
+      it 'should raise InvalidCompError' do
+        expect{Translator.translate_comp(nil)}.to raise_error InvalidCompError
+      end
+    end
+
+    context 'if comp == 0' do
+      it 'should return 0101010' do
+        expect(Translator.translate_comp('0')).to eq('0101010')
+      end
+    end
+
+    context 'if comp == 1' do
+      it 'should return 0111111' do
+        expect(Translator.translate_comp('1')).to eq('0111111')
+      end
+    end
+
+    context 'if comp == 1' do
+      it 'should return 0111111' do
+        expect(Translator.translate_comp('1')).to eq('0111111')
+      end
+    end
+
+    context 'if comp == -1' do
+      it 'should return 0111010' do
+        expect(Translator.translate_comp('-1')).to eq('0111010')
+      end
+    end
+
+    context 'if comp == D' do
+      it 'should return 0001100' do
+        expect(Translator.translate_comp('D')).to eq('0001100')
+      end
+    end
+
+    context 'if comp == A' do
+      it 'should return 0110000' do
+        expect(Translator.translate_comp('A')).to eq('0110000')
+      end
+    end
+
+    context 'if comp == M' do
+      it 'should return 1110000' do
+        expect(Translator.translate_comp('M')).to eq('1110000')
+      end
+    end
+
+    context 'if comp == !D' do
+      it 'should return 0001101' do
+        expect(Translator.translate_comp('!D')).to eq('0001101')
+      end
+    end
+
+    context 'if comp == !A' do
+      it 'should return 0110001' do
+        expect(Translator.translate_comp('!A')).to eq('0110001')
+      end
+    end
+
+    context 'if comp == !M' do
+      it 'should return 1110001' do
+        expect(Translator.translate_comp('!M')).to eq('1110001')
+      end
+    end
+
+    context 'if comp == -D' do
+      it 'should return 0001111' do
+        expect(Translator.translate_comp('-D')).to eq('0001111')
+      end
+    end
+
+    context 'if comp == -A' do
+      it 'should return 0110011' do
+        expect(Translator.translate_comp('-A')).to eq('0110011')
+      end
+    end
+
+    context 'if comp == -M' do
+      it 'should return 1110011' do
+        expect(Translator.translate_comp('-M')).to eq('1110011')
+      end
+    end
+
+    context 'if comp == D+1 / 1+D' do
+      it 'should return 1110011' do
+        expect(Translator.translate_comp('D+1')).to eq('0011111')
+        expect(Translator.translate_comp('1+D')).to eq('0011111')
+      end
+    end
+
+    context 'if comp == A+1 / 1+A' do
+      it 'should return 0110111' do
+        expect(Translator.translate_comp('A+1')).to eq('0110111')
+        expect(Translator.translate_comp('1+A')).to eq('0110111')
+      end
+    end
+
+    context 'if comp == M+1 / 1+M' do
+      it 'should return 1110111' do
+        expect(Translator.translate_comp('M+1')).to eq('1110111')
+        expect(Translator.translate_comp('1+M')).to eq('1110111')
+      end
+    end
+
+    context 'if comp == D-1' do
+      it 'should return 0001110' do
+        expect(Translator.translate_comp('D-1')).to eq('0001110')
+      end
+    end
+
+    context 'if comp == A-1' do
+      it 'should return 0110010' do
+        expect(Translator.translate_comp('A-1')).to eq('0110010')
+      end
+    end
+
+    context 'if comp == M-1' do
+      it 'should return 1110010' do
+        expect(Translator.translate_comp('M-1')).to eq('1110010')
+      end
+    end
+
+    context 'if comp == D+A / A+D' do
+      it 'should return 0000010' do
+        expect(Translator.translate_comp('D+A')).to eq('0000010')
+        expect(Translator.translate_comp('A+D')).to eq('0000010')
+      end
+    end
+
+    context 'if comp == D+M / M+D' do
+      it 'should return 1000010' do
+        expect(Translator.translate_comp('D+M')).to eq('1000010')
+        expect(Translator.translate_comp('M+D')).to eq('1000010')
+      end
+    end
+
+    context 'if comp == D-A' do
+      it 'should return 0010011' do
+        expect(Translator.translate_comp('D-A')).to eq('0010011')
+      end
+    end
+
+    context 'if comp == D-M' do
+      it 'should return 1010011' do
+        expect(Translator.translate_comp('D-M')).to eq('1010011')
+      end
+    end
+
+    context 'if comp == A-D' do
+      it 'should return 0000111' do
+        expect(Translator.translate_comp('A-D')).to eq('0000111')
+      end
+    end
+
+    context 'if comp == M-D' do
+      it 'should return 1000111' do
+        expect(Translator.translate_comp('M-D')).to eq('1000111')
+      end
+    end
+
+    context 'if comp == D&A / A&D' do
+      it 'should return 0000000' do
+        expect(Translator.translate_comp('D&A')).to eq('0000000')
+        expect(Translator.translate_comp('A&D')).to eq('0000000')
+      end
+    end
+
+    context 'if comp == D&M / M&D' do
+      it 'should return 1000000' do
+        expect(Translator.translate_comp('D&M')).to eq('1000000')
+        expect(Translator.translate_comp('M&D')).to eq('1000000')
+      end
+    end
+
+    context 'if comp == D|A / A|D' do
+      it 'should return 0010101' do
+        expect(Translator.translate_comp('D|A')).to eq('0010101')
+        expect(Translator.translate_comp('A|D')).to eq('0010101')
+      end
+    end
+
+    context 'if comp == D|M / M|D' do
+      it 'should return 0010101' do
+        expect(Translator.translate_comp('D|M')).to eq('1010101')
+        expect(Translator.translate_comp('M|D')).to eq('1010101')
+      end
+    end
+
+    context 'if invalid comp is given' do
+      it 'should raise InvalidCompError' do
+        expect{Translator.translate_comp('MM')}.to raise_error InvalidCompError
+      end
+    end
+  end
 end
