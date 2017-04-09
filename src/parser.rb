@@ -8,7 +8,7 @@ class Parser
   attr_accessor :current_command, :command_type, :symbol, :dest, :comp, :jump
   attr_reader :file, :translator
 
-  def initialize(file_path, translator = Translator)
+  def initialize(file_path, translator = Translator.instance)
     @file = File.open(file_path)
     @translator = translator
   end
@@ -43,11 +43,11 @@ class Parser
       parse_a(m[1])
     elsif (m = current_command.match(/^\((\w+)\)$/))
       parse_l(m[1])
-    elsif (m = current_command.match(/^(\w+)=(\w+[+-]\w+|\w+);(\w+)$/))
+    elsif (m = current_command.match(/^(\w+)=(\w+[+\-&|]\w+|[-!]?\w+);(\w+)$/))
       parse_c(dest: m[1], comp: m[2], jump: m[3])
-    elsif (m = current_command.match(/^(\w+)=(\w+[+-]\w+|\w+)$/))
+    elsif (m = current_command.match(/^(\w+)=(\w+[+\-&|]\w+|[-!]?\w+)$/))
       parse_c(dest: m[1], comp: m[2], jump: nil)
-    elsif (m = current_command.match(/^(\w+[+-]\w+|\w+);(\w+)$/))
+    elsif (m = current_command.match(/^(\w+[+\-&|]\w+|[-!]?\w+);(\w+)$/))
       parse_c(dest: nil, comp: m[1], jump: m[2])
     else
       raise InvalidCommandError, "#{current_command} does not match any types of command"
