@@ -1,4 +1,5 @@
 require_relative './translator'
+require 'pry-byebug'
 
 class Parser
 
@@ -10,11 +11,10 @@ class Parser
   def initialize(file_path, translator = Translator)
     @file = File.open(file_path)
     @translator = translator
-    advance
   end
 
   def advance
-    self.current_command = format_line(file.gets)
+    self.current_command = get_next_line(file)
     if current_command
       parse
     else
@@ -25,11 +25,17 @@ class Parser
 
   private
 
-  def format_line(line)
-    return if line.nil?
+  def get_next_line(file)
+    # Skip until you get assembly line
+    # ex: // Ignore this kine of unnecessary lines
+    while(l = file.gets)
+      blank_removed = l.gsub(/(\t|\s|\r\n|\r|\n)/, '')
+      comment_removed = blank_removed.gsub(%r(//.*), '')
 
-    blank_removed = line.gsub(/(\t|\s|\r\n|\r|\n)/, '')
-    blank_removed.gsub(%r(//.*), '')
+      return comment_removed unless comment_removed.empty?
+    end
+
+    nil
   end
 
   def parse
