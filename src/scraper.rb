@@ -1,3 +1,5 @@
+require 'singleton'
+
 class Scraper
   include Singleton
 

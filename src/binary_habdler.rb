@@ -1,6 +1,6 @@
-require_relative './translator'
+require_relative './handler'
 
-class BinaryHandler
+class BinaryHandler < Handler
   attr_reader :translator, :command_type, :symbol, :dest, :comp, :jump
 
   def initialize(translator)
@@ -8,15 +8,15 @@ class BinaryHandler
   end
 
   def parse(current_command)
-    if (m = current_command.match(/^@(\w+)/))
+    if (m = a_command?(current_command))
       parse_a(m[1])
-    elsif (m = current_command.match(/^\((\w+)\)$/))
+    elsif (m = l_command?(current_command))
       parse_l(m[1])
-    elsif (m = current_command.match(/^(\w+)=(\w+[+\-&|]\w+|[-!]?\w+);(\w+)$/))
+    elsif (m = c_full_command?(current_command))
       parse_c(dest: m[1], comp: m[2], jump: m[3])
-    elsif (m = current_command.match(/^(\w+)=(\w+[+\-&|]\w+|[-!]?\w+)$/))
+    elsif (m = c_no_jump_command?(current_command))
       parse_c(dest: m[1], comp: m[2], jump: nil)
-    elsif (m = current_command.match(/^(\w+[+\-&|]\w+|[-!]?\w+);(\w+)$/))
+    elsif (m = c_only_jump_command?(current_command))
       parse_c(dest: nil, comp: m[1], jump: m[2])
     else
       raise InvalidCommandError, "#{current_command} does not match any types of command"
