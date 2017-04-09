@@ -6,6 +6,13 @@ class Translator
   include Singleton
 
   class << self
+    def translate_symbol(symbol)
+      s = symbol.to_i.to_s(2).rjust(15, '0')
+      raise InvalidSymbolError, "Symbol #{symbol} is too large" if s.length != 15
+
+      s
+    end
+
 
     def translate_dest(dest)
       binarize(dest) do |d|
@@ -90,6 +97,7 @@ class Translator
   end
 end
 
+class InvalidSymbolError < StandardError; end
 class InvalidDestinationError < StandardError; end
 class InvalidJumpError < StandardError; end
 class InvalidCompError < StandardError; end

@@ -15,7 +15,12 @@ class Parser
 
   def advance
     self.current_command = format_line(file.gets)
-    current_command ? parse : file.close
+    if current_command
+      parse
+    else
+      file.close
+      false
+    end
   end
 
   private
@@ -33,45 +38,46 @@ class Parser
     elsif (m = current_command.match(/^\((\w+)\)$/))
       parse_l(m[1])
     elsif (m = current_command.match(/^(\w+)=(\w+[+-]\w+|\w+);(\w+)$/))
-      parse_c_full(m[1], m[2], m[3])
+      parse_c(dest: m[1], comp: m[2], jump: m[3])
     elsif (m = current_command.match(/^(\w+)=(\w+[+-]\w+|\w+)$/))
-      parse_c_no_jump(m[1], m[2])
+      parse_c(dest: m[1], comp: m[2], jump: nil)
     elsif (m = current_command.match(/^(\w+[+-]\w+|\w+);(\w+)$/))
-      parse_c_only_jump(m[1], m[2])
+      parse_c(dest: nil, comp: m[1], jump: m[2])
     else
-      raise InvalidCommandError, "The line does not match any types of command: #{current_command}"
+      raise InvalidCommandError, "#{current_command} does not match any types of command"
     end
   end
 
   def parse_a(symbol)
     self.command_type = COMMAND_TYPE[:a_command]
-    self.symbol = symbol
+    self.symbol = translator.translate_symbol(symbol)
+
+    return_a_binary
   end
 
   def parse_l(symbol)
     self.command_type = COMMAND_TYPE[:l_command]
-    self.symbol = symbol
+    self.symbol = translator.translate_symbol(symbol)
+
+    nil
   end
 
-  def parse_c_full(dest, comp, jump)
+  def parse_c(dest:, comp:, jump:)
     self.command_type = COMMAND_TYPE[:c_command]
+
     self.dest = translator.translate_dest(dest)
     self.comp = translator.translate_comp(comp)
     self.jump = translator.translate_jump(jump)
+
+    return_c_binary
   end
 
-  def parse_c_no_jump(dest, comp)
-    self.command_type = COMMAND_TYPE[:c_command]
-    self.dest = translator.translate_dest(dest)
-    self.comp = translator.translate_comp(comp)
-    self.jump = translator.translate_jump(nil)
+  def return_a_binary
+    '0' + symbol
   end
 
-  def parse_c_only_jump(comp, jump)
-    self.command_type = COMMAND_TYPE[:c_command]
-    self.dest = translator.translate_dest(nil)
-    self.comp = translator.translate_comp(comp)
-    self.jump = translator.translate_jump(jump)
+  def return_c_binary
+    '111' + comp + dest + jump
   end
 
 end

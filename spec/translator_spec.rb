@@ -3,6 +3,22 @@ require 'spec_helper'
 describe 'Translator' do
 
   describe '#translate_dest' do
+    context 'if proper symbol is given' do
+      it 'should return right binary form of the value' do
+        expect(Translator.translate_symbol('0')).to eq('000000000000000')
+        expect(Translator.translate_symbol('1')).to eq('000000000000001')
+        expect(Translator.translate_symbol('3')).to eq('000000000000011')
+      end
+    end
+
+    context 'if invalid symbol is given' do
+      it 'should raise InvalidSymbolError if value is too large' do
+        expect{Translator.translate_symbol('11111111111111111111111111111111111111111111')}.to raise_error InvalidSymbolError
+      end
+    end
+  end
+
+  describe '#translate_dest' do
     context 'if dest == nil' do
       it 'should return 000' do
         expect(Translator.translate_dest(nil)).to eq('000')
