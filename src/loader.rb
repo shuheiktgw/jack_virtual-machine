@@ -8,6 +8,8 @@ class Loader
     @handler = handler
   end
 
+  # ここ読み込みまでDIする
+  # advance をprivateにして中で実行ファイル的にループを回す感じで
   def advance
     @current_command = get_next_line
     if current_command

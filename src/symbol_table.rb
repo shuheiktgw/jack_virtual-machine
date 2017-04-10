@@ -30,39 +30,47 @@ class SymbolTable
   attr_reader :symbol_table
 
   def initialize
-    @symbol_table = PREDEFINED_SYMBOLS
-    @current_memory_address = 0
+    @symbol_table = {}.merge(PREDEFINED_SYMBOLS)
+    @current_memory_address = 16
   end
 
-  def add_a_symbol(symbol)
+  def register_a_symbol(symbol)
     symbol_sym = symbol.to_sym
-    raise InvalidSymbolError, "You cannot overwrite predefined symbol, #{symbol}" if PREDEFINED_SYMBOLS.has_key?(symbol_sym)
+    raise InvalidSymbolError, "You cannot overwrite the predefined symbols, #{symbol}" if PREDEFINED_SYMBOLS.has_key?(symbol_sym)
 
-
-
-
-
-
+    unless registered? symbol_sym
+      symbol_table[symbol_sym] = current_memory_address
+    end
   end
 
-  def add_l_symbol(symbol, address)
+  def register_l_symbol(symbol, address)
     symbol_sym = symbol.to_sym
-    raise InvalidSymbolError, "You cannot overwrite predefined symbol, #{symbol}" if PREDEFINED_SYMBOLS.has_key?(symbol_sym)
+    raise InvalidSymbolError, "You cannot overwrite the predefined symbols, #{symbol}" if PREDEFINED_SYMBOLS.has_key?(symbol_sym)
 
-  end
-
-  def registered?(symbol)
-    symbol_table.has_key?(symbol.to_sym)
+    symbol_table[symbol_sym] = address
   end
 
   def get_address(symbol)
     symbol_sym = symbol.to_sym
 
     if registered? symbol_sym
-      symbol_table[symbol_sym]
+      binarize_address(symbol_table[symbol_sym])
     else
       raise UnregisteredSymbolError, "#{symbol} has not registered to the current symbol table."
     end
+  end
+
+  private
+
+  def registered?(symbol)
+    symbol_table.has_key?(symbol.to_sym)
+  end
+
+  def current_memory_address
+    c = @current_memory_address
+    @current_memory_address += 1
+
+    c
   end
 
   def binarize_address(address)
