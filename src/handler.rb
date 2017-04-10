@@ -1,5 +1,5 @@
 class Handler
-  def parse
+  def parse(_current_command, _line_num)
     raise UnimplementedError, "You have to Override #parse in #{self.class}"
   end
 

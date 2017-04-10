@@ -7,7 +7,7 @@ class BinaryHandler < Handler
     @translator = translator
   end
 
-  def parse(current_command)
+  def parse(current_command, line_num)
     if (m = a_command?(current_command))
       parse_a(m[1])
     elsif (m = l_command?(current_command))

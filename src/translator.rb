@@ -12,7 +12,6 @@ class Translator
     s
   end
 
-
   def translate_dest(dest)
     binarize(dest) do |d|
       dest_hash = { d1: 0, d2: 0, d3: 0 }

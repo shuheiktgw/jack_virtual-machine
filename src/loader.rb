@@ -1,7 +1,7 @@
 require 'pry-byebug'
 
 class Loader
-  attr_reader :handler, :file, :current_command
+  attr_reader :handler, :file, :current_command, :line_num
 
   def initialize(file_path, handler)
     @file = File.open(file_path)
