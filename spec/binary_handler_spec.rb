@@ -8,7 +8,11 @@ describe BinaryHandler do
       allow(@translator).to receive(:translate_dest).and_return('0')
       allow(@translator).to receive(:translate_comp).and_return('0')
       allow(@translator).to receive(:translate_jump).and_return('0')
-      @handler = BinaryHandler.new(@translator)
+
+      @recorder = double('Recorder')
+      allow(@recorder).to receive(:register)
+
+      @handler = BinaryHandler.new(@translator, @recorder)
     end
 
     context 'if a command type is a' do

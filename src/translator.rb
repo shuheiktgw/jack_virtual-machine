@@ -1,15 +1,27 @@
-require 'singleton'
 
 # Translator is the same with the class which is called Code in the lecture
 # Translate C command into binary code
 class Translator
-  include Singleton
+
+  attr_reader :symbol_recorder
+
+  def initialize(symbol_recorder)
+    @symbol_recorder = symbol_recorder
+  end
 
   def translate_symbol(symbol)
-    s = symbol.to_i.to_s(2).rjust(15, '0')
-    raise InvalidSymbolError, "Symbol #{symbol} is too large" if s.length != 15
 
-    s
+    binary =
+      if (i = integer?(symbol))
+        i
+      else
+        symbol_recorder.get_address(symbol)
+      end
+
+    result = binary.to_i.to_s(2).rjust(15, '0')
+    raise InvalidSymbolError, "Symbol #{symbol} is too large" if result.length != 15
+
+    result
   end
 
   def translate_dest(dest)
@@ -91,6 +103,12 @@ class Translator
     # Also they should not have duplicate characters
     chars.any? { |c| !DESTINATION.values.include?(c) } ||
       chars.length != chars.uniq.length
+  end
+
+  def integer?(str)
+    Integer(str)
+  rescue ArgumentError
+    false
   end
 end
 

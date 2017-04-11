@@ -3,6 +3,10 @@ class Handler
     raise UnimplementedError, "You have to Override #parse in #{self.class}"
   end
 
+  def result
+    recorder.result
+  end
+
   private
 
   def a_command?(current_command)

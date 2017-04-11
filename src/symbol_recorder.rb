@@ -1,4 +1,4 @@
-class SymbolTable
+class SymbolRecorder
 
   PREDEFINED_SYMBOLS =
     {
@@ -27,10 +27,10 @@ class SymbolTable
       KBD: 24576,
     }
 
-  attr_reader :symbol_table
+  attr_reader :recorder
 
   def initialize
-    @symbol_table = {}.merge(PREDEFINED_SYMBOLS)
+    @recorder = {}.merge(PREDEFINED_SYMBOLS)
     @current_memory_address = 16
   end
 
@@ -39,7 +39,7 @@ class SymbolTable
     raise InvalidSymbolError, "You cannot overwrite the predefined symbols, #{symbol}" if PREDEFINED_SYMBOLS.has_key?(symbol_sym)
 
     unless registered? symbol_sym
-      symbol_table[symbol_sym] = current_memory_address
+      recorder[symbol_sym] = current_memory_address
     end
   end
 
@@ -47,14 +47,14 @@ class SymbolTable
     symbol_sym = symbol.to_sym
     raise InvalidSymbolError, "You cannot overwrite the predefined symbols, #{symbol}" if PREDEFINED_SYMBOLS.has_key?(symbol_sym)
 
-    symbol_table[symbol_sym] = address
+    recorder[symbol_sym] = address
   end
 
   def get_address(symbol)
     symbol_sym = symbol.to_sym
 
     if registered? symbol_sym
-      binarize_address(symbol_table[symbol_sym])
+      recorder[symbol_sym]
     else
       raise UnregisteredSymbolError, "#{symbol} has not registered to the current symbol table."
     end
@@ -63,7 +63,7 @@ class SymbolTable
   private
 
   def registered?(symbol)
-    symbol_table.has_key?(symbol.to_sym)
+    recorder.has_key?(symbol.to_sym)
   end
 
   def current_memory_address
@@ -71,13 +71,6 @@ class SymbolTable
     @current_memory_address += 1
 
     c
-  end
-
-  def binarize_address(address)
-    s = address.to_s(2).rjust(15, '0')
-    raise InvalidSymbolError, "Symbol #{symbol} is too large" if s.length != 15
-
-    s
   end
 end
 

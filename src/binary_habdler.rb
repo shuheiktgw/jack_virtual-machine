@@ -1,10 +1,11 @@
 require_relative './handler'
 
 class BinaryHandler < Handler
-  attr_reader :translator, :command_type, :symbol, :dest, :comp, :jump
+  attr_reader :translator, :recorder, :command_type, :symbol, :dest, :comp, :jump
 
-  def initialize(translator)
+  def initialize(translator, recorder)
     @translator = translator
+    @recorder = recorder
   end
 
   def parse(current_command, line_num)
@@ -31,7 +32,7 @@ class BinaryHandler < Handler
     @command_type = COMMAND_TYPE[:a_command]
     @symbol = translator.translate_symbol(symbol)
 
-    return_a_binary
+    register_a_binary
   end
 
   def parse_l(symbol)
@@ -48,15 +49,15 @@ class BinaryHandler < Handler
     @comp = translator.translate_comp(comp)
     @jump = translator.translate_jump(jump)
 
-    return_c_binary
+    register_c_binary
   end
 
-  def return_a_binary
-    '0' + symbol
+  def register_a_binary
+    recorder.register('0' + symbol)
   end
 
-  def return_c_binary
-    '111' + comp + dest + jump
+  def register_c_binary
+    recorder.register('111' + comp + dest + jump)
   end
 
 end
