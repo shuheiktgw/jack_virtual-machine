@@ -26,9 +26,9 @@ class Translator
 
     raise InvalidDestinationError, "#{dest} is invalid form for destination assembly" if invalid_dest?(dest)
 
-    dest_hash[:d1] = 1 if d.include?(DESTINATION[:a_reg])
-    dest_hash[:d2] = 1 if d.include?(DESTINATION[:d_reg])
-    dest_hash[:d3] = 1 if d.include?(DESTINATION[:memory])
+    dest_hash[:d1] = 1 if dest.include?(DESTINATION[:a_reg])
+    dest_hash[:d2] = 1 if dest.include?(DESTINATION[:d_reg])
+    dest_hash[:d3] = 1 if dest.include?(DESTINATION[:memory])
 
     binarize_dest(dest_hash)
   end
@@ -88,7 +88,7 @@ class Translator
 
   def binarize(original)
     b = original.to_i.to_s(2).rjust(15, '0')
-    raise InvalidSymbolError, "Symbol #{symbol} is too large" if b.length != 15
+    raise InvalidSymbolError, "Symbol #{original} is too large" if b.length != 15
 
     b
   end
