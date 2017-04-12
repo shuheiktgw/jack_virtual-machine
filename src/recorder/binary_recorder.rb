@@ -10,7 +10,7 @@ module Recorder
     def register(binary)
       File.write(file_path, binary)
     end
-    
+
     private
 
     def create_hack_path(file_path)
