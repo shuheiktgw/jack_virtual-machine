@@ -1,19 +1,23 @@
 require 'pry-byebug'
 
 class Loader
-  attr_reader :handler, :file, :current_command, :line_num
+  attr_reader :handler, :file, :current_command
 
   def initialize(file_path, handler)
     @file = File.open(file_path)
     @handler = handler
   end
 
-  # ここ読み込みまでDIする
-  # advance をprivateにして中で実行ファイル的にループを回す感じで
+  def execute
+    while advance ;end
+    handler.result
+  end
+
   def advance
     @current_command = get_next_line
     if current_command
       handler.parse(current_command)
+      true
     else
       file.close
       false

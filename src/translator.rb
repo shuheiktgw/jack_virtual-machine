@@ -10,33 +10,27 @@ class Translator
   end
 
   def translate_symbol(symbol)
-
-    binary =
+    result =
       if (i = integer?(symbol))
         i
       else
         symbol_recorder.get_address(symbol)
       end
 
-    result = binary.to_i.to_s(2).rjust(15, '0')
-    raise InvalidSymbolError, "Symbol #{symbol} is too large" if result.length != 15
-
-    result
+    binarize(result)
   end
 
   def translate_dest(dest)
-    binarize(dest) do |d|
-      dest_hash = { d1: 0, d2: 0, d3: 0 }
-      next dest_hash if d.nil?
+    dest_hash = { d1: 0, d2: 0, d3: 0 }
+    return binarize_dest(dest_hash) if dest.nil?
 
-      raise InvalidDestinationError, "#{dest} is invalid form for destination assembly" if invalid_dest?(dest)
+    raise InvalidDestinationError, "#{dest} is invalid form for destination assembly" if invalid_dest?(dest)
 
-      dest_hash[:d1] = 1 if d.include?(DESTINATION[:a_reg])
-      dest_hash[:d2] = 1 if d.include?(DESTINATION[:d_reg])
-      dest_hash[:d3] = 1 if d.include?(DESTINATION[:memory])
+    dest_hash[:d1] = 1 if d.include?(DESTINATION[:a_reg])
+    dest_hash[:d2] = 1 if d.include?(DESTINATION[:d_reg])
+    dest_hash[:d3] = 1 if d.include?(DESTINATION[:memory])
 
-      dest_hash
-    end
+    binarize_dest(dest_hash)
   end
 
   def translate_comp(comp)
@@ -93,8 +87,14 @@ class Translator
   JUMP = { jgt: 'JGT', jeq: 'JEQ', jge: 'JGE', jlt: 'JLT', jne: 'JNE', jle: 'JLE', jmp: 'JMP' }
 
   def binarize(original)
-    hash = yield(original)
-    hash.reduce('') { |sum, pair| sum+pair[1].to_s }
+    b = original.to_i.to_s(2).rjust(15, '0')
+    raise InvalidSymbolError, "Symbol #{symbol} is too large" if b.length != 15
+
+    b
+  end
+
+  def binarize_dest(dist_hash)
+    dist_hash.reduce('') { |sum, pair| sum+pair[1].to_s }
   end
 
   def invalid_dest?(dest)

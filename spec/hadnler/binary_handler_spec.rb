@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe BinaryHandler do
+describe Handler::BinaryHandler do
   describe '#parse' do
     before :each do
       @translator = double('Translator')
@@ -12,7 +12,7 @@ describe BinaryHandler do
       @recorder = double('Recorder')
       allow(@recorder).to receive(:register)
 
-      @handler = BinaryHandler.new(@translator, @recorder)
+      @handler = Handler::BinaryHandler.new(@translator, @recorder)
     end
 
     context 'if a command type is a' do
