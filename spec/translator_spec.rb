@@ -11,19 +11,7 @@ describe Translator do
   describe '#translate_symbol' do
 
     context 'when symbol is integer' do
-      context 'if proper symbol is given' do
-        it 'should return right binary form of the value' do
-          expect(@translator.translate_symbol('0')).to eq('000000000000000')
-          expect(@translator.translate_symbol('1')).to eq('000000000000001')
-          expect(@translator.translate_symbol('3')).to eq('000000000000011')
-        end
-      end
 
-      context 'if invalid symbol is given' do
-        it 'should raise InvalidSymbolError if value is too large' do
-          expect{@translator.translate_symbol('11111111111111111111111111111111111111111111')}.to raise_error InvalidSymbolError
-        end
-      end
     end
 
     context 'when symbol is non integer' do

@@ -15,22 +15,24 @@ describe Recorder::SymbolRecorder do
 
     context 'if symbol is not predefined' do
       context 'when symbol is not defined' do
-        it 'should register the first symbol' do
-          @symbol_recorder.register_a_symbol(:FIRST)
-          expect(@symbol_recorder.get_address(:FIRST).to_i).to eq(16)
-        end
+        context 'when symbol id Symbol'do
+          it 'should register the first symbol' do
+            @symbol_recorder.register_a_symbol(:FIRST)
+            expect(@symbol_recorder.get_address(:FIRST).to_i).to eq(16)
+          end
 
-        it 'should be able to register multiple symbols' do
-          @symbol_recorder.register_a_symbol(:FIRST)
-          @symbol_recorder.register_a_symbol(:SECOND)
-          expect(@symbol_recorder.get_address(:FIRST).to_i).to eq(16)
-          expect(@symbol_recorder.get_address(:SECOND).to_i).to eq(17)
-        end
+          it 'should be able to register multiple symbols' do
+            @symbol_recorder.register_a_symbol(:FIRST)
+            @symbol_recorder.register_a_symbol(:SECOND)
+            expect(@symbol_recorder.get_address(:FIRST).to_i).to eq(16)
+            expect(@symbol_recorder.get_address(:SECOND).to_i).to eq(17)
+          end
 
-        it 'should ignore duplicate symbols' do
-          @symbol_recorder.register_a_symbol(:FIRST)
-          @symbol_recorder.register_a_symbol(:FIRST)
-          expect(@symbol_recorder.get_address(:FIRST).to_i).to eq(16)
+          it 'should ignore duplicate symbols' do
+            @symbol_recorder.register_a_symbol(:FIRST)
+            @symbol_recorder.register_a_symbol(:FIRST)
+            expect(@symbol_recorder.get_address(:FIRST).to_i).to eq(16)
+          end
         end
       end
     end
@@ -67,9 +69,20 @@ describe Recorder::SymbolRecorder do
   end
 
   describe '#get_address' do
-    context 'if undefined symbol is given' do
-      it 'should raise UnregisteredSymbolError' do
-        expect{@symbol_recorder.get_address(:UNDEFINED)}.to raise_error UnregisteredSymbolError
+    context 'when a symbol is Symbol' do
+      context 'if undefined symbol is given' do
+        it 'should raise UnregisteredSymbolError' do
+          expect{@symbol_recorder.get_address(:UNDEFINED)}.to raise_error UnregisteredSymbolError
+        end
+      end
+    end
+    context 'when a symbol is integer' do
+      context 'if proper symbol is given' do
+        it 'should return right binary form of the value' do
+          expect(@symbol_recorder.get_address('0')).to eq(0)
+          expect(@symbol_recorder.get_address('1')).to eq(1)
+          expect(@symbol_recorder.get_address('3')).to eq(3)
+        end
       end
     end
   end
