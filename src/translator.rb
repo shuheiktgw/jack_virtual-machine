@@ -10,14 +10,7 @@ class Translator
   end
 
   def translate_symbol(symbol)
-    result =
-      if (i = integer?(symbol))
-        i
-      else
-        symbol_recorder.get_address(symbol)
-      end
-
-    binarize(result)
+    binarize(symbol_recorder.get_address(symbol))
   end
 
   def translate_dest(dest)
@@ -103,12 +96,6 @@ class Translator
     # Also they should not have duplicate characters
     chars.any? { |c| !DESTINATION.values.include?(c) } ||
       chars.length != chars.uniq.length
-  end
-
-  def integer?(str)
-    Integer(str)
-  rescue ArgumentError
-    false
   end
 end
 

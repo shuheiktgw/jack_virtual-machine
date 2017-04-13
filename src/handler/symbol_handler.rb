@@ -1,9 +1,12 @@
+require_relative './base_handler'
+require_relative '../recorder/symbol_recorder'
+
 module Handler
   class SymbolHandler < BaseHandler
 
     attr_reader :recorder, :current_line_num
 
-    def initialize(recorder = SymbolRecorder.new)
+    def initialize(recorder = Recorder::SymbolRecorder.new)
       # -1 → Haven't read a single line yet
       @recorder = recorder
       @current_line_num = -1

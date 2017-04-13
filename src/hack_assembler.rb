@@ -1,7 +1,10 @@
-require_relative './recorder'
-require_relative './handler'
+require_relative './recorder/binary_recorder'
+require_relative './recorder/symbol_recorder'
+require_relative './handler/binary_handler'
+require_relative './handler/symbol_handler'
 require_relative './loader'
 require_relative './translator'
+
 
 class HackAssembler
 
@@ -15,8 +18,12 @@ class HackAssembler
     binary_loader.execute
   end
 
+  def new_file_path
+    binary_recorder.file_path
+  end
+
   private
-  
+
   def symbol_handler
     Handler::SymbolHandler.new
   end
@@ -30,7 +37,7 @@ class HackAssembler
   end
 
   def binary_recorder
-    Recorder::BinaryRecorder.new(file_path)
+    @binary_recorder ||= Recorder::BinaryRecorder.new(file_path)
   end
 
   def translator

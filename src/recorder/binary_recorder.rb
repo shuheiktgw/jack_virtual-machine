@@ -5,10 +5,11 @@ module Recorder
 
     def initialize(file_path)
       @file_path = create_hack_path(file_path)
+      delete_if_existing
     end
 
     def register(binary)
-      File.write(file_path, binary)
+      File.open(file_path, 'a') {|f| f.puts binary}
     end
 
     private
@@ -21,6 +22,10 @@ module Recorder
       end
 
       hack_file_path
+    end
+
+    def delete_if_existing
+      File.delete file_path if File.exist?(file_path)
     end
   end
 end

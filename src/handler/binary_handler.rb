@@ -1,3 +1,5 @@
+require_relative './base_handler'
+
 module Handler
   class BinaryHandler < BaseHandler
     attr_reader :translator, :recorder, :command_type, :symbol, :dest, :comp, :jump

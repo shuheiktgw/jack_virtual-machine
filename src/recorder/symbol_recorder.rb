@@ -36,6 +36,8 @@ module Recorder
     end
 
     def register_a_symbol(symbol)
+      return if integer?(symbol)
+
       symbol_sym = symbol.to_sym
       raise InvalidSymbolError, "You cannot overwrite the predefined symbols, #{symbol}" if PREDEFINED_SYMBOLS.has_key?(symbol_sym)
 
@@ -52,6 +54,10 @@ module Recorder
     end
 
     def get_address(symbol)
+      if (i = integer?(symbol))
+        return i
+      end
+
       symbol_sym = symbol.to_sym
 
       if registered? symbol_sym
@@ -72,6 +78,12 @@ module Recorder
       @current_memory_address += 1
 
       c
+    end
+
+    def integer?(str)
+      Integer(str)
+    rescue ArgumentError
+      false
     end
   end
 end
