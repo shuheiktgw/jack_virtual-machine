@@ -1,4 +1,3 @@
-require 'pry-byebug'
 
 class Loader
   attr_reader :handler, :file, :current_command
@@ -27,8 +26,7 @@ class Loader
   private
 
   def get_next_line
-    # Skip until you get assembly line
-    # ex: // Ignore this kine of unnecessary lines
+    # Skip unnecessary lines, such as comments
     while(l = file.gets)
       blank_removed = l.gsub(/(\t|\s|\r\n|\r|\n)/, '')
       comment_removed = blank_removed.gsub(%r(//.*), '')

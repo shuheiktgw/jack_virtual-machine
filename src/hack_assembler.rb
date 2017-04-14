@@ -5,7 +5,6 @@ require_relative './handler/symbol_handler'
 require_relative './loader'
 require_relative './translator'
 
-
 class HackAssembler
 
   attr_reader :file_path
