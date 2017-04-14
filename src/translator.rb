@@ -10,7 +10,7 @@ class Translator
   end
 
   def translate_symbol(symbol)
-    binarize(symbol_recorder.get_address(symbol))
+    binarize(symbol_recorder.get(symbol))
   end
 
   def translate_dest(dest)

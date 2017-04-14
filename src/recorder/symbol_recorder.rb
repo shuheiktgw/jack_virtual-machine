@@ -28,32 +28,14 @@ module Recorder
         KBD: 24576,
       }
 
-    attr_reader :recorder
+    attr_reader :recorder, :current_memory_address
 
     def initialize
       @recorder = {}.merge(PREDEFINED_SYMBOLS)
       @current_memory_address = 16
     end
 
-    def register_a_symbol(symbol)
-      return if integer?(symbol)
-
-      symbol_sym = symbol.to_sym
-      raise InvalidSymbolError, "You cannot overwrite the predefined symbols, #{symbol}" if PREDEFINED_SYMBOLS.has_key?(symbol_sym)
-
-      unless registered? symbol_sym
-        recorder[symbol_sym] = current_memory_address
-      end
-    end
-
-    def register_l_symbol(symbol, address)
-      symbol_sym = symbol.to_sym
-      raise InvalidSymbolError, "You cannot overwrite the predefined symbols, #{symbol}" if PREDEFINED_SYMBOLS.has_key?(symbol_sym)
-
-      recorder[symbol_sym] = address
-    end
-
-    def get_address(symbol)
+    def get(symbol)
       if (i = integer?(symbol))
         return i
       end
@@ -63,8 +45,24 @@ module Recorder
       if registered? symbol_sym
         recorder[symbol_sym]
       else
-        raise UnregisteredSymbolError, "#{symbol} has not registered to the current symbol table."
+        register(symbol_sym)
       end
+    end
+
+    def register_label(symbol, address)
+      symbol_sym = symbol.to_sym
+      raise InvalidSymbolError, "You cannot overwrite the predefined symbols, #{symbol}" if PREDEFINED_SYMBOLS.has_key?(symbol_sym)
+
+      recorder[symbol_sym] = address
+    end
+
+    def register(symbol)
+      symbol_sym = symbol.to_sym
+
+      recorder[symbol_sym] = current_memory_address
+      @current_memory_address += 1
+
+      recorder[symbol_sym]
     end
 
     private
@@ -73,16 +71,9 @@ module Recorder
       recorder.has_key?(symbol.to_sym)
     end
 
-    def current_memory_address
-      c = @current_memory_address
-      @current_memory_address += 1
-
-      c
-    end
-
     def integer?(str)
       Integer(str)
-    rescue TypeError
+    rescue ArgumentError
       false
     end
   end

@@ -35,11 +35,11 @@ module Handler
     end
 
     def a_command?(current_command)
-      current_command.match(/^@(\w+)/)
+      current_command.match(/^@([\w._$:]+)/)
     end
 
     def l_command?(current_command)
-      current_command.match(/^\((\w+)\)$/)
+      current_command.match(/^\(([\w._$:]+)\)$/)
     end
 
     def c_full_command?(current_command)
