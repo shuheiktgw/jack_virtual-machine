@@ -73,7 +73,7 @@ module Recorder
 
     def integer?(str)
       Integer(str)
-    rescue ArgumentError
+    rescue ArgumentError, TypeError
       false
     end
   end

@@ -8,19 +8,6 @@ describe Translator do
     @translator = Translator.new(recorder)
   end
 
-  describe '#translate_symbol' do
-
-    context 'when symbol is integer' do
-
-    end
-
-    context 'when symbol is non integer' do
-      it 'should return registered address' do
-        expect(@translator.translate_symbol('REGISTERED')).to eq('000000000010000')
-      end
-    end
-  end
-
   describe '#translate_dest' do
     context 'if dest == nil' do
       it 'should return 000' do

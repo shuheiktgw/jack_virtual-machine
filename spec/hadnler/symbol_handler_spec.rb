@@ -4,8 +4,7 @@ describe Handler::SymbolHandler do
   describe '#parse' do
     before :each do
       @recorder = double('Recorder')
-      allow(@recorder).to receive(:register_a_symbol)
-      allow(@recorder).to receive(:register_l_symbol)
+      allow(@recorder).to receive(:register_label)
 
       @handler = Handler::SymbolHandler.new(@recorder)
     end
