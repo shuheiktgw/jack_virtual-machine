@@ -1,21 +1,21 @@
 
 class Loader
-  attr_reader :handler, :file, :current_command
+  attr_reader :dispatcher, :file, :current_command
 
-  def initialize(file_path, handler)
+  def initialize(file_path, dispatcher)
     @file = File.open(file_path)
-    @handler = handler
+    @dispatcher = dispatcher
   end
 
   def execute
     while advance ;end
-    handler.result
+    dispatcher.result
   end
 
   def advance
     @current_command = get_next_line
     if current_command
-      handler.parse(current_command)
+      dispatcher.dispatch(current_command)
       true
     else
       file.close
@@ -38,6 +38,6 @@ class Loader
   end
 
   def method_missing(name, *args)
-    handler.send(name, *args)
+    dispatcher.send(name, *args)
   end
 end
