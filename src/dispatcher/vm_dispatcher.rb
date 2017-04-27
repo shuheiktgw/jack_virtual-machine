@@ -16,17 +16,6 @@ module Dispatcher
       call: :C_CALL
     }
 
-    MEMORY_SEGMENTS = {
-      argument: :argument,
-      local: :local,
-      static: :static,
-      constant: :constant,
-      this: :this,
-      that: :that,
-      pointer: :pointer,
-      temp: :temp
-    }
-
     def initialize(translator)
       @translator = translator
     end
@@ -61,6 +50,7 @@ module Dispatcher
     def handle_push(match)
       @command_type = COMMAND_TYPES[:push]
       translator.push(segment: match[1], arg: match[2])
+      # DON'T forget attach original command at the top of the translated values
     end
 
     def pop?(command)
@@ -70,6 +60,7 @@ module Dispatcher
     def handle_pop(match)
       @command_type = COMMAND_TYPES[:pop]
       translator.pop(segment: match[1], arg: match[2])
+      # DON'T forget attach original command at the top of the translated values
     end
   end
 
