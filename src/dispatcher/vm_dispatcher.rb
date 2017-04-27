@@ -60,7 +60,7 @@ module Dispatcher
 
     def handle_push(match)
       @command_type = COMMAND_TYPES[:push]
-      translator.push(type: match[1], arg: match[2])
+      translator.push(segment: match[1], arg: match[2])
     end
 
     def pop?(command)
@@ -69,7 +69,7 @@ module Dispatcher
 
     def handle_pop(match)
       @command_type = COMMAND_TYPES[:pop]
-      translator.pop(type: match[1], arg: match[2])
+      translator.pop(segment: match[1], arg: match[2])
     end
   end
 
