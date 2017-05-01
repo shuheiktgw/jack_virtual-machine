@@ -49,8 +49,8 @@ module Dispatcher
 
     def handle_push(match)
       @command_type = COMMAND_TYPES[:push]
-      translator.push(segment: match[1], arg: match[2])
-      # DON'T forget attach original command at the top of the translated values
+      translator.push(segment: match[1], idx: match[2])
+      # DON'T forget attach original command on top of the translated values
     end
 
     def pop?(command)
@@ -59,8 +59,8 @@ module Dispatcher
 
     def handle_pop(match)
       @command_type = COMMAND_TYPES[:pop]
-      translator.pop(segment: match[1], arg: match[2])
-      # DON'T forget attach original command at the top of the translated values
+      translator.pop(segment: match[1], idx: match[2])
+      # DON'T forget attach original command on top of the translated values
     end
   end
 
