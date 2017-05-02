@@ -4,11 +4,14 @@ describe Dispatcher::VmDispatcher do
   describe '#dispatch' do
     before :each do
       @translator = double('Translator')
-      allow(@translator).to receive(:arithmetic)
-      allow(@translator).to receive(:push)
-      allow(@translator).to receive(:pop)
+      allow(@translator).to receive(:arithmetic).and_return '@test'
+      allow(@translator).to receive(:push).and_return '@test'
+      allow(@translator).to receive(:pop).and_return '@test'
 
-      @dispatcher = Dispatcher::VmDispatcher.new(@translator)
+      @recorder = double('Recorder')
+      allow(@recorder).to receive(:record)
+
+      @dispatcher = Dispatcher::VmDispatcher.new(@translator, @recorder)
     end
 
     context 'if a command type is arithmetic' do

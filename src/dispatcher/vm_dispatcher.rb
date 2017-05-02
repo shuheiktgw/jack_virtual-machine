@@ -2,7 +2,7 @@
 module Dispatcher
   class VmDispatcher
 
-    attr_reader :translator, :command_type
+    attr_reader :translator, :recorder, :command_type
 
     COMMAND_TYPES = {
       arithmetic: :C_ARITHMETIC,
@@ -16,12 +16,13 @@ module Dispatcher
       call: :C_CALL
     }
 
-    def initialize(translator)
+    def initialize(translator, recorder)
       @translator = translator
+      @recorder = recorder
     end
 
     def dispatch(current_command)
-      if (m = arithmetic?(current_command))
+      t = if (m = arithmetic?(current_command))
         handle_arithmetic(m)
       elsif (m = push?(current_command))
         handle_push(m)
@@ -30,6 +31,8 @@ module Dispatcher
       else
         raise Dispatcher::InvalidCommandError, "#{current_command} is an invalid form of command."
       end
+
+      recorder.record "// #{current_command}\n" + t
     end
 
     private
@@ -50,7 +53,6 @@ module Dispatcher
     def handle_push(match)
       @command_type = COMMAND_TYPES[:push]
       translator.push(segment: match[1], idx: match[2])
-      # DON'T forget attach original command on top of the translated values
     end
 
     def pop?(command)
@@ -60,7 +62,6 @@ module Dispatcher
     def handle_pop(match)
       @command_type = COMMAND_TYPES[:pop]
       translator.pop(segment: match[1], idx: match[2])
-      # DON'T forget attach original command on top of the translated values
     end
   end
 

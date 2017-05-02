@@ -1,7 +1,4 @@
-require_relative './recorder/binary_recorder'
-require_relative './recorder/symbol_recorder'
-require_relative './handler/binary_handler'
-require_relative './handler/symbol_handler'
+
 require_relative './loader'
 
 class HackAssembler

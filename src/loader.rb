@@ -3,7 +3,7 @@ class Loader
   attr_reader :dispatcher, :file, :current_command
 
   def initialize(file_path, dispatcher)
-    @file = File.open(file_path)
+    @file = File.open file_path
     @dispatcher = dispatcher
   end
 
@@ -15,7 +15,7 @@ class Loader
   def advance
     @current_command = get_next_line
     if current_command
-      dispatcher.dispatch(current_command)
+      dispatcher.dispatch(self)
       true
     else
       file.close
@@ -40,4 +40,6 @@ class Loader
   def method_missing(name, *args)
     dispatcher.send(name, *args)
   end
+
+  class InvalidFilePath < StandardError; end
 end
