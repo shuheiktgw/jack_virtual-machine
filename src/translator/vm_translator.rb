@@ -79,7 +79,7 @@ module Translator
         when MEMORY_SEGMENT[:static]
           "@#{file_name}.#{idx}\n" << "D=M\n"
         else
-          raise InvalidStackOperation, "segment: #{segment}, index: #{idx} is an invalid stack operation."
+          raise InvalidStackOperation, "#{segment} is an unknown segment."
       end
 
       set_result = "@SP\nA=M\nM=D\n"
@@ -104,7 +104,7 @@ module Translator
         when MEMORY_SEGMENT[:static]
           "@#{file_name}.#{idx}\n"
         else
-          raise InvalidStackOperation, "segment: #{segment}, index: #{idx} is an invalid stack operation."
+          raise InvalidStackOperation, "#{segment} is an unknown segment."
       end
 
       # Reserve the destination address @SP temporarily
