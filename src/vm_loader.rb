@@ -15,7 +15,7 @@ class VmLoader
   def advance
     @current_command = get_next_line
     if current_command
-      dispatcher.dispatch(self)
+      dispatcher.dispatch(current_command)
       true
     else
       file.close
