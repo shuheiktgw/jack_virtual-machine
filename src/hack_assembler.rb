@@ -1,6 +1,3 @@
-
-require_relative './loader'
-
 class HackAssembler
 
   attr_reader :file_path

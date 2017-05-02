@@ -1,5 +1,5 @@
 
-class Loader
+class VmLoader
   attr_reader :dispatcher, :file, :current_command
 
   def initialize(file_path, dispatcher)
@@ -9,7 +9,7 @@ class Loader
 
   def execute
     while advance ;end
-    dispatcher.result
+    dispatcher.recorder
   end
 
   def advance
@@ -40,6 +40,4 @@ class Loader
   def method_missing(name, *args)
     dispatcher.send(name, *args)
   end
-
-  class InvalidFilePath < StandardError; end
 end
