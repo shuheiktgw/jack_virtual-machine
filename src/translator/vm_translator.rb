@@ -45,8 +45,9 @@ module Translator
           condition = "D=D-M\n@EQ#{counter}\nD;JEQ\n@NOT_EQ#{counter}\n0;JMP\n"
           eq = "(EQ#{counter})\nD=-1\n@END#{counter}\n0;JMP\n"
           not_eq = "(NOT_EQ#{counter})\nD=0\n(END#{counter})\n"
+          set_dest = "@SP\nM=M-1\nM=M-1\nA=M\n"
 
-          condition + eq + not_eq
+          condition + eq + not_eq + set_dest
         when ARITHMETIC[:lt]
           # M < D
 
@@ -54,8 +55,9 @@ module Translator
           condition = "D=M-D\n@LT#{counter}\nD;JLT\n@GT#{counter}\n0;JMP\n"
           lt = "(LT#{counter})\nD=-1\n@END#{counter}\n0;JMP\n"
           gt = "(GT#{counter})\nD=0\n(END#{counter})\n"
+          set_dest = "@SP\nM=M-1\nM=M-1\nA=M\n"
 
-          condition + lt + gt
+          condition + lt + gt + set_dest
         when ARITHMETIC[:gt]
           # M > D
 
@@ -63,20 +65,21 @@ module Translator
           condition = "D=M-D\n@GT#{counter}\nD;JGT\n@LT#{counter}\n0;JMP\n"
           gt = "(GT#{counter})\nD=-1\n@END#{counter}\n0;JMP\n"
           lt = "(LT#{counter})\nD=0\n(END#{counter})\n"
+          set_dest = "@SP\nM=M-1\nM=M-1\nA=M\n"
 
-          condition + gt + lt
+          condition + gt + lt + set_dest
         when ARITHMETIC[:add]
           "D=D+M\n"
         when ARITHMETIC[:sub]
-          "D=D-M\n"
+          "D=M-D\n"
         when ARITHMETIC[:neg]
-          "D=-D\n"
+          "D=-D\nA=A+1\n"
         when ARITHMETIC[:and]
           "D=M&D\n"
         when ARITHMETIC[:or]
           "D=M|D\n"
         when ARITHMETIC[:not]
-          "D=!D\n"
+          "D=!D\nA=A+1\n"
         else
           raise InvalidStackOperation, "#{command} is an invalid invalid stack operation."
       end
