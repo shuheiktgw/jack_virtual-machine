@@ -104,7 +104,8 @@ module Translator
         when MEMORY_SEGMENT[:that]
           "@THAT\n" + extract_value
         when MEMORY_SEGMENT[:pointer]
-          "@THIS\n" + extract_value
+          t = idx == '0' ? "@THIS\n" : "@THAT\n"
+          t + "D=M\n"
         when MEMORY_SEGMENT[:temp]
           "@R5\n" + "D=A\n@#{idx}\nA=D+A\nD=M\n"
         when MEMORY_SEGMENT[:constant]
@@ -136,7 +137,8 @@ module Translator
         when MEMORY_SEGMENT[:that]
           "@THAT\n" + set_destination
         when MEMORY_SEGMENT[:pointer]
-          "@THIS\n" + set_destination
+          t = idx == '0' ? "@THIS\n" : "@THAT\n"
+          t + "D=A\n@SP\nA=M\nM=D\n"
         when MEMORY_SEGMENT[:temp]
           "@R5\n" + "D=A\n@#{idx}\nD=D+A\n@SP\nA=M\nM=D\n"
         when MEMORY_SEGMENT[:static]
@@ -147,7 +149,7 @@ module Translator
 
       extract_value = "@SP\nA=M-1\nD=M\n"
 
-      set_result = "@SP\nA=M\nA=M\nA=M\nM=D\n"
+      set_result = "@SP\nA=M\nA=M\nM=D\n"
 
       decrease_sp = "@SP\nM=M-1\n"
 
