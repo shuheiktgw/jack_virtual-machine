@@ -25,10 +25,10 @@ module Translator
       static: 'static'
     }
 
-    attr_reader :file_name, :counter
+    attr_reader :static_file_name, :counter
 
     def initialize(file_name)
-      @file_name = file_name
+      @static_file_name = extract_file_name file_name
       @counter = 0
     end
 
@@ -111,7 +111,7 @@ module Translator
         when MEMORY_SEGMENT[:constant]
           "@#{idx}\n" + "D=A\n"
         when MEMORY_SEGMENT[:static]
-          "@#{file_name}.#{idx}\n" + "D=M\n"
+          "@#{static_file_name}.#{idx}\n" + "D=M\n"
         else
           raise InvalidStackOperation, "#{segment} is an unknown segment."
       end
@@ -142,7 +142,7 @@ module Translator
         when MEMORY_SEGMENT[:temp]
           "@R5\n" + "D=A\n@#{idx}\nD=D+A\n@SP\nA=M\nM=D\n"
         when MEMORY_SEGMENT[:static]
-          "@#{file_name}.#{idx}\n" + "D=A\n@#{idx}\nD=D+A\n@SP\nA=M\nM=D\n"
+          "@#{static_file_name}.#{idx}\n" + "D=A\n@SP\nA=M\nM=D\n"
         else
           raise InvalidStackOperation, "#{segment} is an unknown segment."
       end
@@ -154,6 +154,13 @@ module Translator
       decrease_sp = "@SP\nM=M-1\n"
 
       set_address + extract_value + set_result +  decrease_sp
+    end
+
+    private
+
+    def extract_file_name(file_name)
+      m = file_name.match(/^.*\/([-_\w]+)\.vm$/)
+      m[1]
     end
   end
 
