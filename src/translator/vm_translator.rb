@@ -69,7 +69,7 @@ module Translator
 
           condition + gt + lt + set_dest
         when ARITHMETIC[:add]
-          "D=D+M\n"
+          "D=M+D\n"
         when ARITHMETIC[:sub]
           "D=M-D\n"
         when ARITHMETIC[:neg]
@@ -86,31 +86,31 @@ module Translator
 
       set_result = "M=D\n"
 
-      increase_sp = "D=A+1\n@SP\nM=D"
+      increase_sp = "D=A+1\n@SP\nM=D\n"
 
-      extract_values << execute_calc << set_result << increase_sp
+      extract_values + execute_calc + set_result + increase_sp
     end
 
     def push(segment:, idx:)
-      extract_value = "D=A\n@#{idx}\nA=D+A\nD=M\n"
+      extract_value = "D=M\n@#{idx}\nA=D+A\nD=M\n"
 
       base_address = case segment
         when MEMORY_SEGMENT[:local]
-          "@LCL\n" << extract_value
+          "@LCL\n" + extract_value
         when MEMORY_SEGMENT[:argument]
-          "@ARG\n" << extract_value
+          "@ARG\n" + extract_value
         when MEMORY_SEGMENT[:this]
-          "@THIS\n" << extract_value
+          "@THIS\n" + extract_value
         when MEMORY_SEGMENT[:that]
-          "@THAT\n" << extract_value
+          "@THAT\n" + extract_value
         when MEMORY_SEGMENT[:pointer]
-          "@THIS\n" << extract_value
+          "@THIS\n" + extract_value
         when MEMORY_SEGMENT[:temp]
-          "@R5\n" << extract_value
+          "@R5\n" + "D=A\n@#{idx}\nA=D+A\nD=M\n"
         when MEMORY_SEGMENT[:constant]
-          "@#{idx}\n" << "D=A\n"
+          "@#{idx}\n" + "D=A\n"
         when MEMORY_SEGMENT[:static]
-          "@#{file_name}.#{idx}\n" << "D=M\n"
+          "@#{file_name}.#{idx}\n" + "D=M\n"
         else
           raise InvalidStackOperation, "#{segment} is an unknown segment."
       end
@@ -119,39 +119,39 @@ module Translator
 
       increase_sp = "@SP\nM=M+1\n"
 
-      base_address << set_result << increase_sp
+      base_address + set_result + increase_sp
     end
 
     def pop(segment:, idx:)
-      base_address = case segment
+      # Reserve the destination address @SP temporarily
+      set_destination = "D=M\n@#{idx}\nD=D+A\n@SP\nA=M\nM=D\n"
+
+      set_address = case segment
         when MEMORY_SEGMENT[:local]
-          "@LCL\n"
+          "@LCL\n" + set_destination
         when MEMORY_SEGMENT[:argument]
-          "@ARG\n"
+          "@ARG\n" + set_destination
         when MEMORY_SEGMENT[:this]
-          "@THIS\n"
+          "@THIS\n" + set_destination
         when MEMORY_SEGMENT[:that]
-          "@THAT\n"
+          "@THAT\n" + set_destination
         when MEMORY_SEGMENT[:pointer]
-          "@THIS\n"
+          "@THIS\n" + set_destination
         when MEMORY_SEGMENT[:temp]
-          "@R5\n"
+          "@R5\n" + "D=A\n@#{idx}\nD=D+A\n@SP\nA=M\nM=D\n"
         when MEMORY_SEGMENT[:static]
-          "@#{file_name}.#{idx}\n"
+          "@#{file_name}.#{idx}\n" + "D=A\n@#{idx}\nD=D+A\n@SP\nA=M\nM=D\n"
         else
           raise InvalidStackOperation, "#{segment} is an unknown segment."
       end
 
-      # Reserve the destination address @SP temporarily
-      set_destination = "D=A\n@#{idx}\nD=D+A\n@SP\nM=D\n"
+      extract_value = "@SP\nA=M-1\nD=M\n"
 
-      extract_value = "@SP\nA=A-1\nD=M\n"
-
-      set_result = "@SP\nA=M\nM=D\n"
+      set_result = "@SP\nA=M\nA=M\nA=M\nM=D\n"
 
       decrease_sp = "@SP\nM=M-1\n"
 
-      base_address << set_destination << extract_value << set_result <<  decrease_sp
+      set_address + extract_value + set_result +  decrease_sp
     end
   end
 
