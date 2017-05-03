@@ -11,10 +11,46 @@ describe Translator::VmTranslator do
   # =================
 
   describe '#arithmetic' do
+    context 'if command == eq' do
+      it 'should return expected value' do
+        expect(translator.arithmetic('eq')).to eq(
+          "@SP\nA=M-1\nD=M\nA=A-1\n"+
+            "D=D-M\n@EQ1\nD;JEQ\n@NOT_EQ1\n0;JMP\n"+
+            "(EQ1)\nD=-1\n@END1\n0;JMP\n"+
+            "(NOT_EQ1)\nD=0\n(END1)\n"+
+            "M=D\nD=A+1\n@SP\nM=D"
+        )
+      end
+    end
+
+    context 'if command == lt' do
+      it 'should return expected value' do
+        expect(translator.arithmetic('lt')).to eq(
+          "@SP\nA=M-1\nD=M\nA=A-1\n"+
+            "D=M-D\n@LT1\nD;JLT\n@GT1\n0;JMP\n"+
+            "(LT1)\nD=-1\n@END1\n0;JMP\n"+
+            "(GT1)\nD=0\n(END1)\n"+
+            "M=D\nD=A+1\n@SP\nM=D"
+        )
+      end
+    end
+
+    context 'if command == gt' do
+      it 'should return expected value' do
+        expect(translator.arithmetic('gt')).to eq(
+          "@SP\nA=M-1\nD=M\nA=A-1\n"+
+            "D=M-D\n@GT1\nD;JGT\n@LT1\n0;JMP\n"+
+            "(GT1)\nD=-1\n@END1\n0;JMP\n"+
+            "(LT1)\nD=0\n(END1)\n"+
+            "M=D\nD=A+1\n@SP\nM=D"
+        )
+      end
+    end
+
     context 'if command == add' do
       it 'should return expected value' do
         expect(translator.arithmetic('add')).to eq(
-          "@SP\nA=M-1\nD=M\nA=A-1\nD=D+M\nM=D\n@SP\nM=M+1\n"
+          "@SP\nA=M-1\nD=M\nA=A-1\nD=D+M\nM=D\nD=A+1\n@SP\nM=D"
         )
       end
     end
@@ -22,7 +58,7 @@ describe Translator::VmTranslator do
     context 'if command == sub' do
       it 'should return expected value' do
         expect(translator.arithmetic('sub')).to eq(
-          "@SP\nA=M-1\nD=M\nA=A-1\nD=D-M\nM=D\n@SP\nM=M+1\n"
+          "@SP\nA=M-1\nD=M\nA=A-1\nD=D-M\nM=D\nD=A+1\n@SP\nM=D"
         )
       end
     end
@@ -30,7 +66,7 @@ describe Translator::VmTranslator do
     context 'if command == neg' do
       it 'should return expected value' do
         expect(translator.arithmetic('neg')).to eq(
-          "@SP\nA=M-1\nD=M\nA=A-1\nD=-D\nM=D\n@SP\nM=M+1\n"
+          "@SP\nA=M-1\nD=M\nA=A-1\nD=-D\nM=D\nD=A+1\n@SP\nM=D"
         )
       end
     end
@@ -38,7 +74,7 @@ describe Translator::VmTranslator do
     context 'if command == and' do
       it 'should return expected value' do
         expect(translator.arithmetic('and')).to eq(
-          "@SP\nA=M-1\nD=M\nA=A-1\nD=M&D\nM=D\n@SP\nM=M+1\n"
+          "@SP\nA=M-1\nD=M\nA=A-1\nD=M&D\nM=D\nD=A+1\n@SP\nM=D"
         )
       end
     end
@@ -46,7 +82,7 @@ describe Translator::VmTranslator do
     context 'if command == or' do
       it 'should return expected value' do
         expect(translator.arithmetic('or')).to eq(
-          "@SP\nA=M-1\nD=M\nA=A-1\nD=M|D\nM=D\n@SP\nM=M+1\n"
+          "@SP\nA=M-1\nD=M\nA=A-1\nD=M|D\nM=D\nD=A+1\n@SP\nM=D"
         )
       end
     end
@@ -54,7 +90,7 @@ describe Translator::VmTranslator do
     context 'if command == not' do
       it 'should return expected value' do
         expect(translator.arithmetic('not')).to eq(
-          "@SP\nA=M-1\nD=M\nA=A-1\nD=!D\nM=D\n@SP\nM=M+1\n"
+          "@SP\nA=M-1\nD=M\nA=A-1\nD=!D\nM=D\nD=A+1\n@SP\nM=D"
         )
       end
     end

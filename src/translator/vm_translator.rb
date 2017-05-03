@@ -25,10 +25,11 @@ module Translator
       static: 'static'
     }
 
-    attr_reader :file_name
+    attr_reader :file_name, :counter
 
     def initialize(file_name)
       @file_name = file_name
+      @counter = 0
     end
 
     def arithmetic(command)
@@ -37,6 +38,33 @@ module Translator
       extract_values ="@SP\nA=M-1\nD=M\nA=A-1\n"
 
       execute_calc = case command
+        when ARITHMETIC[:eq]
+          # D = M
+
+          @counter += 1
+          condition = "D=D-M\n@EQ#{counter}\nD;JEQ\n@NOT_EQ#{counter}\n0;JMP\n"
+          eq = "(EQ#{counter})\nD=-1\n@END#{counter}\n0;JMP\n"
+          not_eq = "(NOT_EQ#{counter})\nD=0\n(END#{counter})\n"
+
+          condition + eq + not_eq
+        when ARITHMETIC[:lt]
+          # M < D
+
+          @counter += 1
+          condition = "D=M-D\n@LT#{counter}\nD;JLT\n@GT#{counter}\n0;JMP\n"
+          lt = "(LT#{counter})\nD=-1\n@END#{counter}\n0;JMP\n"
+          gt = "(GT#{counter})\nD=0\n(END#{counter})\n"
+
+          condition + lt + gt
+        when ARITHMETIC[:gt]
+          # M > D
+
+          @counter += 1
+          condition = "D=M-D\n@GT#{counter}\nD;JGT\n@LT#{counter}\n0;JMP\n"
+          gt = "(GT#{counter})\nD=-1\n@END#{counter}\n0;JMP\n"
+          lt = "(LT#{counter})\nD=0\n(END#{counter})\n"
+
+          condition + gt + lt
         when ARITHMETIC[:add]
           "D=D+M\n"
         when ARITHMETIC[:sub]
@@ -54,6 +82,8 @@ module Translator
       end
 
       set_result = "M=D\n"
+
+      increase_sp = "D=A+1\n@SP\nM=D"
 
       extract_values << execute_calc << set_result << increase_sp
     end
@@ -83,6 +113,8 @@ module Translator
       end
 
       set_result = "@SP\nA=M\nM=D\n"
+
+      increase_sp = "@SP\nM=M+1\n"
 
       base_address << set_result << increase_sp
     end
@@ -114,17 +146,10 @@ module Translator
 
       set_result = "@SP\nA=M\nM=D\n"
 
+      decrease_sp = "@SP\nM=M-1\n"
+
       base_address << set_destination << extract_value << set_result <<  decrease_sp
     end
-
-    def increase_sp
-      "@SP\nM=M+1\n"
-    end
-
-    def decrease_sp
-      "@SP\nM=M-1\n"
-    end
-
   end
 
   class InvalidStackOperation < StandardError; end
