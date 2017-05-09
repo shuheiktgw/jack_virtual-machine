@@ -124,8 +124,8 @@ module Translator
     end
 
     def pop(segment:, idx:)
-      # Reserve the destination address @SP temporarily
-      set_destination = "D=M\n@#{idx}\nD=D+A\n@SP\nA=M\nM=D\n"
+      # Reserve the destination address @R13 temporarily
+      set_destination = "D=M\n@#{idx}\nD=D+A\n@R13\nM=D\n"
 
       set_address = case segment
         when MEMORY_SEGMENT[:local]
@@ -138,18 +138,18 @@ module Translator
           "@THAT\n" + set_destination
         when MEMORY_SEGMENT[:pointer]
           t = idx == '0' ? "@THIS\n" : "@THAT\n"
-          t + "D=A\n@SP\nA=M\nM=D\n"
+          t + "D=A\n@R13\nM=D\n"
         when MEMORY_SEGMENT[:temp]
-          "@R5\n" + "D=A\n@#{idx}\nD=D+A\n@SP\nA=M\nM=D\n"
+          "@R5\n" + "D=A\n@#{idx}\nD=D+A\n@R13\nM=D\n"
         when MEMORY_SEGMENT[:static]
-          "@#{static_file_name}.#{idx}\n" + "D=A\n@SP\nA=M\nM=D\n"
+          "@#{static_file_name}.#{idx}\n" + "D=A\n@R13\nM=D\n"
         else
           raise InvalidStackOperation, "#{segment} is an unknown segment."
       end
 
       extract_value = "@SP\nA=M-1\nD=M\n"
 
-      set_result = "@SP\nA=M\nA=M\nM=D\n"
+      set_result = "@R13\nA=M\nM=D\n"
 
       decrease_sp = "@SP\nM=M-1\n"
 
