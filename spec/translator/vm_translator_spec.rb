@@ -271,7 +271,7 @@ describe Translator::VmTranslator do
 
     describe '#if_goto' do
       it 'should return translated value' do
-        expect(translator.if_goto(label)).to eq "@SP\nA=M-1\nD=M\n" + "@#{label}\nD;JNE\n"
+        expect(translator.if_goto(label)).to eq "@SP\nA=M-1\nD=M\n" + "@SP\nM=M-1\n" + "@#{label}\nD;JNE\n"
       end
     end
   end
