@@ -199,7 +199,7 @@ describe Translator::VmTranslator do
 
         pairs.each do |segment, translated|
           expect(translator.pop(segment: segment.to_s, idx: idx)).to eq(
-            translated + "D=M\n@#{idx}\nD=D+A\n@SP\nA=M\nM=D\n" + "@SP\nA=M-1\nD=M\n" + "@SP\nA=M\nA=M\nM=D\n" + "@SP\nM=M-1\n"
+            translated + "D=M\n@#{idx}\nD=D+A\n@R13\nM=D\n" + "@SP\nA=M-1\nD=M\n" + "@R13\nA=M\nM=D\n" + "@SP\nM=M-1\n"
           )
         end
       end
@@ -211,7 +211,7 @@ describe Translator::VmTranslator do
           pointer_idx = '0'
 
           expect(translator.pop(segment: 'pointer', idx: pointer_idx)).to eq(
-            "@THIS\n" + "D=A\n@SP\nA=M\nM=D\n" + "@SP\nA=M-1\nD=M\n" + "@SP\nA=M\nA=M\nM=D\n" + "@SP\nM=M-1\n"
+            "@THIS\n" + "D=A\n@R13\nM=D\n" + "@SP\nA=M-1\nD=M\n" + "@R13\nA=M\nM=D\n" + "@SP\nM=M-1\n"
           )
         end
       end
@@ -221,7 +221,7 @@ describe Translator::VmTranslator do
           pointer_idx = '1'
 
           expect(translator.pop(segment: 'pointer', idx: pointer_idx)).to eq(
-            "@THAT\n" + "D=A\n@SP\nA=M\nM=D\n" + "@SP\nA=M-1\nD=M\n" + "@SP\nA=M\nA=M\nM=D\n" + "@SP\nM=M-1\n"
+            "@THAT\n" + "D=A\n@R13\nM=D\n" + "@SP\nA=M-1\nD=M\n" + "@R13\nA=M\nM=D\n" + "@SP\nM=M-1\n"
           )
         end
       end
@@ -230,7 +230,7 @@ describe Translator::VmTranslator do
     context 'if segment == temp' do
       it 'should return expected value' do
         expect(translator.pop(segment: 'temp', idx: idx)).to eq(
-          "@R5\n" + "D=A\n@#{idx}\nD=D+A\n@SP\nA=M\nM=D\n" + "@SP\nA=M-1\nD=M\n" + "@SP\nA=M\nA=M\nM=D\n" + "@SP\nM=M-1\n"
+          "@R5\n" + "D=A\n@#{idx}\nD=D+A\n@R13\nM=D\n" + "@SP\nA=M-1\nD=M\n" + "@R13\nA=M\nM=D\n" + "@SP\nM=M-1\n"
         )
       end
     end
@@ -238,7 +238,7 @@ describe Translator::VmTranslator do
     context 'if segment == static' do
       it 'should return expected value' do
         expect(translator.pop(segment: 'static', idx: idx)).to eq(
-          "@#{translator.static_file_name}.#{idx}\n" + "D=A\n@SP\nA=M\nM=D\n" + "@SP\nA=M-1\nD=M\n" + "@SP\nA=M\nA=M\nM=D\n" + "@SP\nM=M-1\n"
+          "@#{translator.static_file_name}.#{idx}\n" + "D=A\n@R13\nM=D\n" + "@SP\nA=M-1\nD=M\n" + "@R13\nA=M\nM=D\n" + "@SP\nM=M-1\n"
         )
       end
     end
@@ -246,6 +246,32 @@ describe Translator::VmTranslator do
     context 'if unknown segment is give' do
       it 'should raise Translator::InvalidStackOperation' do
         expect{translator.pop(segment: 'unknown', idx: '100')}.to raise_error Translator::InvalidStackOperation
+      end
+    end
+  end
+
+  # =================
+  # branching
+  # =================
+
+  context 'if method is about branching' do
+    let(:label){'SOME_LABEL'}
+
+    describe '#label' do
+      it 'should return translated value' do
+        expect(translator.label(label)).to eq "(#{label})\n"
+      end
+    end
+
+    describe '#goto' do
+      it 'should return translated value' do
+        expect(translator.goto(label)).to eq "@#{label}\n0;JMP\n"
+      end
+    end
+
+    describe '#if_goto' do
+      it 'should return translated value' do
+        expect(translator.if_goto(label)).to eq "@SP\nA=M-1\nD=M\n" + "@#{label}\nD;JNE\n"
       end
     end
   end

@@ -147,8 +147,6 @@ module Translator
           raise InvalidStackOperation, "#{segment} is an unknown segment."
       end
 
-      extract_value = "@SP\nA=M-1\nD=M\n"
-
       set_result = "@R13\nA=M\nM=D\n"
 
       decrease_sp = "@SP\nM=M-1\n"
@@ -156,7 +154,23 @@ module Translator
       set_address + extract_value + set_result +  decrease_sp
     end
 
+    def label(label)
+      "(#{label})\n"
+    end
+
+    def goto(label)
+      "@#{label}\n0;JMP\n"
+    end
+
+    def if_goto(label)
+      extract_value + "@#{label}\nD;JNE\n"
+    end
+
     private
+
+    def extract_value
+      "@SP\nA=M-1\nD=M\n"
+    end
 
     def extract_file_name(file_name)
       m = file_name.match(/^.*\/([-_\w]+)\.vm$/)
