@@ -163,6 +163,19 @@ module Translator
       extract_value + decrement_sp + "@#{label}\nD;JNE\n"
     end
 
+    def function(name:, number:)
+      end_label = "END_OF_FUNCION_#{name}"
+      goto_end = "@#{end_label}\n0;JMP\n"
+
+      define_function_label = "(#{name})\n"
+
+      init_local_variables = ""
+
+      define_end = "(#{end_label})\n"
+
+      goto_end + define_function_label + define_end
+    end
+
     private
 
     def extract_value
