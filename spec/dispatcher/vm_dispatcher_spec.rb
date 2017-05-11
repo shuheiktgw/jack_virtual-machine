@@ -131,7 +131,7 @@ describe Dispatcher::VmDispatcher do
       end
 
       it 'should call function method with correct args' do
-        pending('Might have to raw command instead. Fix this someday sometime....')
+        pending('Might have to use raw command instead. Fix this someday sometime....')
         fname = 'Main.fibonacci'
         fnumber = '11'
 
@@ -156,7 +156,7 @@ describe Dispatcher::VmDispatcher do
       end
 
       it 'should call function method with correct args' do
-        pending('Might have to raw command instead. Fix this someday sometime....')
+        pending('Might have to use raw command instead. Fix this someday sometime....')
         fname = 'Main.fibonacci'
         fnumber = '11'
 

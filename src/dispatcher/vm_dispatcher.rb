@@ -103,7 +103,7 @@ module Dispatcher
       translator.if_goto(match[1])
     end
 
-    # FIXME Currently we cannot distinguish "function method2 3" and "function method 23", same with call
+    # FIXME Currently we cannot distinguish "function method2 3" and "function method 23", the same with call
     def function?(command)
       command.match(/^function([a-zA-Z._:][\w._:]*)(\d)$/)
     end

@@ -118,9 +118,8 @@ module Translator
 
       set_result = "@SP\nA=M\nM=D\n"
 
-      increase_sp = "@SP\nM=M+1\n"
 
-      base_address + set_result + increase_sp
+      base_address + set_result + increment_sp
     end
 
     def pop(segment:, idx:)
@@ -149,9 +148,7 @@ module Translator
 
       set_result = "@R13\nA=M\nM=D\n"
 
-      decrease_sp = "@SP\nM=M-1\n"
-
-      set_address + extract_value + set_result +  decrease_sp
+      set_address + extract_value + set_result +  decrement_sp
     end
 
     def label(label)
@@ -163,13 +160,21 @@ module Translator
     end
 
     def if_goto(label)
-      extract_value + "@#{label}\nD;JNE\n"
+      extract_value + decrement_sp + "@#{label}\nD;JNE\n"
     end
 
     private
 
     def extract_value
       "@SP\nA=M-1\nD=M\n"
+    end
+
+    def increment_sp
+      "@SP\nM=M+1\n"
+    end
+
+    def decrement_sp
+      "@SP\nM=M-1\n"
     end
 
     def extract_file_name(file_name)
