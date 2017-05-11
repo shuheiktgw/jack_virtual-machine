@@ -12,8 +12,8 @@ module Dispatcher
       goto: :C_GOTO,
       if: :C_IF,
       function: :C_FUNCTION,
-      return: :C_RETURN,
-      call: :C_CALL
+      call: :C_CALL,
+      return: :C_RETURN
     }
 
     def initialize(translator, recorder)
@@ -34,6 +34,10 @@ module Dispatcher
         handle_goto(m)
       elsif (m = if_goto?(current_command))
         handle_if_goto(m)
+      elsif (m = function?(current_command))
+        handle_function(m)
+      elsif (m = call?(current_command))
+        handle_call(m)
       else
         raise Dispatcher::InvalidCommandError, "#{current_command} is an invalid form of command."
       end
@@ -97,6 +101,25 @@ module Dispatcher
     def handle_if_goto(match)
       @command_type = COMMAND_TYPES[:if]
       translator.if_goto(match[1])
+    end
+
+    # FIXME Currently we cannot distinguish "function method2 3" and "function method 23", same with call
+    def function?(command)
+      command.match(/^function([a-zA-Z._:][\w._:]*)(\d)$/)
+    end
+
+    def handle_function(match)
+      @command_type = COMMAND_TYPES[:function]
+      translator.function(name: match[1], number: match[2])
+    end
+
+    def call?(command)
+      command.match(/^call([a-zA-Z._:][\w._:]*)(\d)$/)
+    end
+
+    def handle_call(match)
+      @command_type = COMMAND_TYPES[:call]
+      translator.call(name: match[1], number: match[2])
     end
   end
 

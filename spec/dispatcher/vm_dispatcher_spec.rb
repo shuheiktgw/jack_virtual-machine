@@ -10,6 +10,8 @@ describe Dispatcher::VmDispatcher do
       allow(@translator).to receive(:goto).and_return '(some_label)'
       allow(@translator).to receive(:label).and_return '(some_label)'
       allow(@translator).to receive(:if_goto).and_return '(some_label)'
+      allow(@translator).to receive(:function).and_return '(some_label)'
+      allow(@translator).to receive(:call).and_return '(some_label)'
 
       @recorder = double('Recorder')
       allow(@recorder).to receive(:record)
@@ -110,6 +112,56 @@ describe Dispatcher::VmDispatcher do
       it 'should call if_goto method with correct label' do
         expect(@translator).to receive(:if_goto).with(label)
         @dispatcher.dispatch(if_goto_command)
+      end
+    end
+
+    context 'if a command type is function' do
+      let(:name) {'Main.fibonacci'}
+      let(:number) {'0'}
+      let(:function_command) { 'function' + name + number }
+
+      it 'should return command type function' do
+        @dispatcher.dispatch(function_command)
+        expect(@dispatcher.command_type).to eq :C_FUNCTION
+      end
+
+      it 'should call function method with correct args' do
+        expect(@translator).to receive(:function).with({name: name, number: number})
+        @dispatcher.dispatch(function_command)
+      end
+
+      it 'should call function method with correct args' do
+        pending('Might have to raw command instead. Fix this someday sometime....')
+        fname = 'Main.fibonacci'
+        fnumber = '11'
+
+        expect(@translator).to receive(:function).with({name: fname, number: fnumber})
+        @dispatcher.dispatch('function' + fname + fnumber)
+      end
+    end
+
+    context 'if a command type is call' do
+      let(:name) {'Main.fibonacci'}
+      let(:number) {'0'}
+      let(:call_command) { 'call' + name + number }
+
+      it 'should return command type function' do
+        @dispatcher.dispatch(call_command)
+        expect(@dispatcher.command_type).to eq :C_CALL
+      end
+
+      it 'should call function method with correct args' do
+        expect(@translator).to receive(:call).with({name: name, number: number})
+        @dispatcher.dispatch(call_command)
+      end
+
+      it 'should call function method with correct args' do
+        pending('Might have to raw command instead. Fix this someday sometime....')
+        fname = 'Main.fibonacci'
+        fnumber = '11'
+
+        expect(@translator).to receive(:call).with({name: fname, number: fnumber})
+        @dispatcher.dispatch('call' + fname + fnumber)
       end
     end
   end
