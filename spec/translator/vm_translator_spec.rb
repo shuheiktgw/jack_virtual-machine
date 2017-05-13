@@ -275,4 +275,28 @@ describe Translator::VmTranslator do
       end
     end
   end
+
+  # =================
+  # subroutine
+  # =================
+
+  describe '#function' do
+    let(:name) {'SOME_FUNCTION'}
+
+    it 'should a single translate initialize code' do
+      expect(translator.function(name: name, number: 1)).to eq(
+        "(#{name})\n" +
+          translator.push(segment: 'constant', idx: 0) + translator.pop(segment: 'local', idx: 0)
+      )
+    end
+
+    it 'should multiple initialize codes' do
+      expect(translator.function(name: name, number: 3)).to eq(
+        "(#{name})\n" +
+          translator.push(segment: 'constant', idx: 0) + translator.pop(segment: 'local', idx: 0) +
+          translator.push(segment: 'constant', idx: 0) + translator.pop(segment: 'local', idx: 1) +
+          translator.push(segment: 'constant', idx: 0) + translator.pop(segment: 'local', idx: 2)
+      )
+    end
+  end
 end

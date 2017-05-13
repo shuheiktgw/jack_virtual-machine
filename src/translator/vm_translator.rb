@@ -164,16 +164,48 @@ module Translator
     end
 
     def function(name:, number:)
-      end_label = "END_OF_FUNCION_#{name}"
-      goto_end = "@#{end_label}\n0;JMP\n"
-
       define_function_label = "(#{name})\n"
 
-      init_local_variables = ""
+      init_local_variable = ->(lcl_idx){push(segment: MEMORY_SEGMENT[:constant], idx: 0) + pop(segment: MEMORY_SEGMENT[:local], idx: lcl_idx)}
+      initialize = (0...number).map{|n| init_local_variable.call(n)}.join
 
-      define_end = "(#{end_label})\n"
+      define_function_label + initialize
+    end
 
-      goto_end + define_function_label + define_end
+    def call(name:, number:)
+      return_address = "RETURN_FROM_#{name + counter}"
+
+      push_to_stack = ->(address){"#{address}\nD=A\n@SP\nA=M\nM=D\n" + increment_sp}
+
+      push_return = push_to_stack.call("@#{return_address}")
+      push_lcl = push_to_stack.call('@LCL')
+      push_arg = push_to_stack.call('@ARG')
+      push_this = push_to_stack.call('@THIS')
+      push_that = push_to_stack.call('@THAT')
+
+      change_arg = "@SP\nD=M\n@#{number}\nD=D-A\n@5\nD=D-A\n@ARG\nM=Dn"
+      change_lcl = "@SP\nD=M\n@LCL\nM=D\n"
+
+      define_return_address = "(#{return_address})"
+      @counter += 1
+
+      push_return + push_lcl+ push_arg + push_this + push_that + change_arg + change_lcl + goto(name) + define_return_address
+    end
+
+    def return
+      define_frame = "@LCL\nD=M\n@FRAME\nM=D\n"
+      extract_return = "@FRAME\nD=A\n@5\nA=D-A\nD=M\n@RET\nM=D\n"
+      set_return_value = "@SP\nA=M-1\nD=M\n@ARG\nA=M\nM=D\n"
+
+      reset_sp = "@ARG\nD=M+1\n@SP\nM=D\n"
+      reset_that = "@FRAME\nD=M-1\n@THAT\nM=D\n"
+      reset_this = "@FRAME\nD=M-2\n@THIS\nM=D\n"
+      reset_arg = "@FRAME\nD=M-3\n@ARG\nM=D\n"
+      reset_lcl = "@FRAME\nD=M-4\n@LCL\nM=D\n"
+
+      goto_return = "@RET\nA=M\n0;JMP\n"
+
+      define_frame + extract_return + set_return_value + reset_sp + reset_that + reset_this + reset_arg + reset_lcl + goto_return
     end
 
     private
