@@ -116,10 +116,8 @@ module Translator
           raise InvalidStackOperation, "#{segment} is an unknown segment."
       end
 
-      set_result = "@SP\nA=M\nM=D\n"
 
-
-      base_address + set_result + increment_sp
+      base_address + save_at_sp
     end
 
     def pop(segment:, idx:)
@@ -175,13 +173,14 @@ module Translator
     def call(name:, number:)
       return_address = "RETURN_FROM_#{name + counter}"
 
-      push_to_stack = ->(address){"#{address}\nD=A\n@SP\nA=M\nM=D\n" + increment_sp}
+      push_raw_address = ->(address){"#{address}\nD=A\n" + save_at_sp}
+      push_saved_address = -> (address){"#{address}\nD=M\n" + save_at_sp}
 
-      push_return = push_to_stack.call("@#{return_address}")
-      push_lcl = push_to_stack.call('@LCL')
-      push_arg = push_to_stack.call('@ARG')
-      push_this = push_to_stack.call('@THIS')
-      push_that = push_to_stack.call('@THAT')
+      push_return = push_raw_address.call("@#{return_address}")
+      push_lcl = push_saved_address.call('@LCL')
+      push_arg = push_saved_address.call('@ARG')
+      push_this = push_saved_address.call('@THIS')
+      push_that = push_saved_address.call('@THAT')
 
       change_arg = "@SP\nD=M\n@#{number}\nD=D-A\n@5\nD=D-A\n@ARG\nM=Dn"
       change_lcl = "@SP\nD=M\n@LCL\nM=D\n"
@@ -194,14 +193,16 @@ module Translator
 
     def return
       define_frame = "@LCL\nD=M\n@FRAME\nM=D\n"
-      extract_return = "@FRAME\nD=A\n@5\nA=D-A\nD=M\n@RET\nM=D\n"
+      extract_return = "@FRAME\nD=M\n@5\nA=D-A\nD=M\n@RET\nM=D\n"
       set_return_value = "@SP\nA=M-1\nD=M\n@ARG\nA=M\nM=D\n"
 
       reset_sp = "@ARG\nD=M+1\n@SP\nM=D\n"
-      reset_that = "@FRAME\nD=M-1\n@THAT\nM=D\n"
-      reset_this = "@FRAME\nD=M-2\n@THIS\nM=D\n"
-      reset_arg = "@FRAME\nD=M-3\n@ARG\nM=D\n"
-      reset_lcl = "@FRAME\nD=M-4\n@LCL\nM=D\n"
+
+      reset_memory = ->(segment){"@FRAME\nM=M-1\nD=M\n#{segment}\nM=D\n"}
+      reset_that = reset_memory.call('@THAT')
+      reset_this = reset_memory.call('@THIS')
+      reset_arg = reset_memory.call('@ARG')
+      reset_lcl = reset_memory.call('@LCL')
 
       goto_return = "@RET\nA=M\n0;JMP\n"
 
@@ -212,6 +213,10 @@ module Translator
 
     def extract_value
       "@SP\nA=M-1\nD=M\n"
+    end
+
+    def save_at_sp
+      "@SP\nA=M\nM=D\n" + increment_sp
     end
 
     def increment_sp
