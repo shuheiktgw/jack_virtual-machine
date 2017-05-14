@@ -259,19 +259,19 @@ describe Translator::VmTranslator do
 
     describe '#label' do
       it 'should return translated value' do
-        expect(translator.label(label)).to eq "(#{label})\n"
+        expect(translator.label(label)).to eq "(Sys.init$#{label})\n"
       end
     end
 
     describe '#goto' do
       it 'should return translated value' do
-        expect(translator.goto(label)).to eq "@#{label}\n0;JMP\n"
+        expect(translator.goto(label)).to eq "@Sys.init$#{label}\n0;JMP\n"
       end
     end
 
     describe '#if_goto' do
       it 'should return translated value' do
-        expect(translator.if_goto(label)).to eq "@SP\nA=M-1\nD=M\n" + "@SP\nM=M-1\n" + "@#{label}\nD;JNE\n"
+        expect(translator.if_goto(label)).to eq "@SP\nA=M-1\nD=M\n" + "@SP\nM=M-1\n" + "@Sys.init$#{label}\nD;JNE\n"
       end
     end
   end
