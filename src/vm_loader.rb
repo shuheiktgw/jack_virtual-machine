@@ -1,16 +1,26 @@
+require 'pry-byebug'
 
 class VmLoader
-  attr_reader :dispatcher, :file, :current_command
+  attr_reader :dispatcher, :file, :file_names, :current_command
+
+  FILE_TYPE = {file: 'file', directory: 'directory'}
 
   def initialize(file_path, dispatcher)
-    @file = File.open file_path
+    @file_names = get_files(file_path)
     @dispatcher = dispatcher
   end
 
   def execute
-    while advance ;end
+    file_names.each do |f|
+      @file = File.open(f)
+      while advance;
+      end
+    end
+
     dispatcher.recorder
   end
+
+  private
 
   def advance
     @current_command = get_next_line
@@ -23,11 +33,9 @@ class VmLoader
     end
   end
 
-  private
-
   def get_next_line
     # Skip unnecessary lines, such as comments
-    while(l = file.gets)
+    while (l = file.gets)
       blank_removed = l.gsub(/(\t|\s|\r\n|\r|\n)/, '')
       comment_removed = blank_removed.gsub(%r(//.*), '')
 
@@ -37,7 +45,26 @@ class VmLoader
     nil
   end
 
-  def method_missing(name, *args)
-    dispatcher.send(name, *args)
+  def get_files(path)
+    file_type = File::ftype(path)
+
+    if file_type == FILE_TYPE[:file]
+      [path]
+    elsif file_type == FILE_TYPE[:directory]
+      names = Dir.glob(path + '/*.vm')
+      initializer = path + '/Sys.vm'
+
+      raise "The directory, #{path} does not contain Sys.vm." unless names.include? (initializer)
+
+      names.reduce([]) do |prev_names, name|
+        if name == initializer
+          prev_names.unshift(name)
+        else
+          prev_names.push(name)
+        end
+      end
+    else
+      raise "Invalid path, #{path} is given."
+    end
   end
 end

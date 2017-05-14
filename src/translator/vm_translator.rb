@@ -30,6 +30,7 @@ module Translator
     def initialize(file_name)
       @static_file_name = extract_file_name file_name
       @counter = 0
+      @current_function_name = 'Sys.init'
     end
 
     def arithmetic(command)
@@ -150,18 +151,20 @@ module Translator
     end
 
     def label(label)
-      "(#{label})\n"
+      "(#{format_label label})\n"
     end
 
     def goto(label)
-      "@#{label}\n0;JMP\n"
+      "@#{format_label label}\n0;JMP\n"
     end
 
     def if_goto(label)
-      extract_value + decrement_sp + "@#{label}\nD;JNE\n"
+      extract_value + decrement_sp + "@#{format_label label}\nD;JNE\n"
     end
 
     def function(name:, number:)
+      @current_function_name = name
+
       define_function_label = "(#{name})\n"
 
       init_local_variable = ->(lcl_idx){push(segment: MEMORY_SEGMENT[:constant], idx: 0) + pop(segment: MEMORY_SEGMENT[:local], idx: lcl_idx)}
@@ -225,6 +228,10 @@ module Translator
 
     def decrement_sp
       "@SP\nM=M-1\n"
+    end
+
+    def format_label(label)
+      "#{@current_function_name}$#{label}"
     end
 
     def extract_file_name(file_name)
