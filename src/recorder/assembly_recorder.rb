@@ -1,6 +1,5 @@
 module Recorder
   class AssemblyRecorder
-
     attr_reader :asm_file_path
 
     def initialize(file_path)
@@ -15,13 +14,15 @@ module Recorder
     private
 
     def asm_path(file_path)
-      asm_file_path = file_path.gsub(/\.vm$/, '.asm')
+      if file_path.match(/\.vm$/)
+        path = file_path.gsub(/\.vm$/, '.asm')
+        raise "#{file_path} is invalid. You have to specify .vm file" if path == file_path
 
-      if asm_file_path == file_path
-        raise "#{file_path} is invalid. You have to specify .vm file"
+        path
+      else
+        dir_name = file_path.match(/\/([\w\d_-]+)$/)[1]
+        file_path + "/#{dir_name}.vm"
       end
-
-      asm_file_path
     end
 
     def delete_if_existing

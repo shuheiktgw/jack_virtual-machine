@@ -1,9 +1,9 @@
 require 'pry-byebug'
 
 class VmLoader
-  attr_reader :dispatcher, :file, :file_names, :current_command
-
   FILE_TYPE = {file: 'file', directory: 'directory'}
+
+  attr_reader :dispatcher, :file, :file_names, :current_command
 
   def initialize(file_path, dispatcher)
     @file_names = get_files(file_path)
