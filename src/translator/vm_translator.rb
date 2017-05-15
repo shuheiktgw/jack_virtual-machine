@@ -170,7 +170,8 @@ module Translator
       init_local_variable = ->(lcl_idx){push(segment: MEMORY_SEGMENT[:constant], idx: 0) + pop(segment: MEMORY_SEGMENT[:local], idx: lcl_idx)}
       initialize = (0...number.to_i).map{|n| init_local_variable.call(n)}.join
 
-      define_function_label + initialize
+      set_sp = "@SP\nD=M\n@#{number}\nD=D+A\n@SP\nM=D\n"
+      define_function_label + initialize + set_sp
     end
 
     def call(name:, number:)
@@ -201,7 +202,7 @@ module Translator
 
       reset_sp = "@ARG\nD=M+1\n@SP\nM=D\n"
 
-      reset_memory = ->(segment){"@FRAME\nM=M-1\nD=M\n#{segment}\nM=D\n"}
+      reset_memory = ->(segment){"@FRAME\nM=M-1\nA=M\nD=M\n#{segment}\nM=D\n"}
       reset_that = reset_memory.call('@THAT')
       reset_this = reset_memory.call('@THIS')
       reset_arg = reset_memory.call('@ARG')
