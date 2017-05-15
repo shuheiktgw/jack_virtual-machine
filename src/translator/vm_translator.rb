@@ -168,7 +168,7 @@ module Translator
       define_function_label = "(#{name})\n"
 
       init_local_variable = ->(lcl_idx){push(segment: MEMORY_SEGMENT[:constant], idx: 0) + pop(segment: MEMORY_SEGMENT[:local], idx: lcl_idx)}
-      initialize = (0...number).map{|n| init_local_variable.call(n)}.join
+      initialize = (0...number.to_i).map{|n| init_local_variable.call(n)}.join
 
       define_function_label + initialize
     end

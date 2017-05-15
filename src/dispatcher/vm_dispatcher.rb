@@ -38,6 +38,8 @@ module Dispatcher
         handle_function(m)
       elsif (m = call?(current_command))
         handle_call(m)
+      elsif (m = return?(current_command))
+        handle_return(m)
       else
         raise Dispatcher::InvalidCommandError, "#{current_command} is an invalid form of command."
       end
@@ -120,6 +122,15 @@ module Dispatcher
     def handle_call(match)
       @command_type = COMMAND_TYPES[:call]
       translator.call(name: match[1], number: match[2])
+    end
+
+    def return?(command)
+      command.match(/^return$/)
+    end
+
+    def handle_return(_match)
+      @command_type = COMMAND_TYPES[:return]
+      translator.return
     end
   end
 

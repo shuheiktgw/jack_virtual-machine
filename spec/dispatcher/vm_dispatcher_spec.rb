@@ -12,6 +12,7 @@ describe Dispatcher::VmDispatcher do
       allow(@translator).to receive(:if_goto).and_return '(some_label)'
       allow(@translator).to receive(:function).and_return '(some_label)'
       allow(@translator).to receive(:call).and_return '(some_label)'
+      allow(@translator).to receive(:return).and_return '(some_label)'
 
       @recorder = double('Recorder')
       allow(@recorder).to receive(:record)
@@ -162,6 +163,20 @@ describe Dispatcher::VmDispatcher do
 
         expect(@translator).to receive(:call).with({name: fname, number: fnumber})
         @dispatcher.dispatch('call' + fname + fnumber)
+      end
+    end
+
+    context 'if a command type is return' do
+      let(:return_command) { 'return' }
+
+      it 'should return command type return' do
+        @dispatcher.dispatch(return_command)
+        expect(@dispatcher.command_type).to eq :C_RETURN
+      end
+
+      it 'should call function method with correct args' do
+        expect(@translator).to receive(:return)
+        @dispatcher.dispatch(return_command)
       end
     end
   end

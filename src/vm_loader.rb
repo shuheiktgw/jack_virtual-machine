@@ -1,5 +1,3 @@
-require 'pry-byebug'
-
 class VmLoader
   FILE_TYPE = {file: 'file', directory: 'directory'}
 
