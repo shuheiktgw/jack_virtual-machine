@@ -5,7 +5,7 @@ module Recorder
     def initialize(file_path)
       @asm_file_path = asm_path(file_path)
       delete_if_existing
-      record_bootstrap
+      initialize_memory
     end
 
     def record(asm)
@@ -30,7 +30,16 @@ module Recorder
       File.delete asm_file_path if File.exist?(asm_file_path)
     end
 
-    def record_bootstrap
+    def initialize_memory
+      initialize_address = -> (address, segment) { "#{address}\nD=A\n#{segment}\nM=D\n" }
+
+      initialize_sp = initialize_address.call('@261', '@SP')
+      initialize_lcl = initialize_address.call('@1024', '@LCL')
+      initialize_arg = initialize_address.call('@2048', '@ARG')
+      initialize_this = initialize_address.call('@3000', '@THIS')
+      initialize_that = initialize_address.call('@3010', '@THAT')
+
+      record(initialize_sp + initialize_lcl + initialize_arg +  initialize_this + initialize_that)
     end
   end
 end
