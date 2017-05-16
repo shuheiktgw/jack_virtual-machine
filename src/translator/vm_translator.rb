@@ -25,6 +25,11 @@ module Translator
       static: 'static'
     }
 
+    FILE_TYPE = {
+      file: 'file',
+      directory: 'directory'
+    }
+
     attr_reader :static_file_name, :counter
 
     def initialize(file_name)
@@ -175,7 +180,7 @@ module Translator
     end
 
     def call(name:, number:)
-      return_address = "RETURN_FROM_#{name + counter}"
+      return_address = "RETURN_FROM_#{name + counter.to_s}"
 
       push_raw_address = ->(address){"#{address}\nD=A\n" + save_at_sp}
       push_saved_address = -> (address){"#{address}\nD=M\n" + save_at_sp}
@@ -186,13 +191,15 @@ module Translator
       push_this = push_saved_address.call('@THIS')
       push_that = push_saved_address.call('@THAT')
 
-      change_arg = "@SP\nD=M\n@#{number}\nD=D-A\n@5\nD=D-A\n@ARG\nM=Dn"
+      change_arg = "@SP\nD=M\n@#{number}\nD=D-A\n@5\nD=D-A\n@ARG\nM=D\n"
       change_lcl = "@SP\nD=M\n@LCL\nM=D\n"
+
+      goto_function = "@#{name}\n0;JMP\n"
 
       define_return_address = "(#{return_address})"
       @counter += 1
 
-      push_return + push_lcl+ push_arg + push_this + push_that + change_arg + change_lcl + goto(name) + define_return_address
+      push_return + push_lcl+ push_arg + push_this + push_that + change_arg + change_lcl + goto_function + define_return_address
     end
 
     def return
@@ -236,7 +243,12 @@ module Translator
     end
 
     def extract_file_name(file_name)
-      m = file_name.match(/^.*\/([-_\w]+)\.vm$/)
+      m =  if File::ftype(file_name) == FILE_TYPE[:file]
+        file_name.match(/^.*\/([-_\w]+)\.vm$/)
+      else
+        file_name.match(/\/([-_\w\d]+)$/)
+      end
+
       m[1]
     end
   end

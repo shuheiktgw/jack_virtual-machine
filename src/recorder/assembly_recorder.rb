@@ -5,6 +5,7 @@ module Recorder
     def initialize(file_path)
       @asm_file_path = asm_path(file_path)
       delete_if_existing
+      record_bootstrap
     end
 
     def record(asm)
@@ -21,12 +22,15 @@ module Recorder
         path
       else
         dir_name = file_path.match(/\/([\w\d_-]+)$/)[1]
-        file_path + "/#{dir_name}.vm"
+        file_path + "/#{dir_name}.asm"
       end
     end
 
     def delete_if_existing
       File.delete asm_file_path if File.exist?(asm_file_path)
+    end
+
+    def record_bootstrap
     end
   end
 end
