@@ -3,13 +3,15 @@ class VmLoader
 
   attr_reader :dispatcher, :file, :file_names, :current_command
 
-  def initialize(file_path, dispatcher)
+  def initialize(file_path, dispatcher, translator)
     @file_names = get_files(file_path)
     @dispatcher = dispatcher
+    @translator = translator
   end
 
   def execute
     file_names.each do |f|
+      @translator.notify_file_change(f)
       @file = File.open(f)
       while advance;
       end

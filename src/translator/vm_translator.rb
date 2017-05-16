@@ -32,8 +32,7 @@ module Translator
 
     attr_reader :static_file_name, :counter
 
-    def initialize(file_name)
-      @static_file_name = extract_file_name file_name
+    def initialize
       @counter = 0
       @current_function_name = 'Sys.init'
     end
@@ -220,6 +219,10 @@ module Translator
       define_frame + extract_return + set_return_value + reset_sp + reset_that + reset_this + reset_arg + reset_lcl + goto_return
     end
 
+    def notify_file_change(new_file_name)
+      @static_file_name = extract_file_name new_file_name
+    end
+
     private
 
     def extract_value
@@ -243,13 +246,7 @@ module Translator
     end
 
     def extract_file_name(file_name)
-      m =  if File::ftype(file_name) == FILE_TYPE[:file]
-        file_name.match(/^.*\/([-_\w]+)\.vm$/)
-      else
-        file_name.match(/\/([-_\w\d]+)$/)
-      end
-
-      m[1]
+      file_name.match(/^.*\/([-_\w]+)\.vm$/)[1]
     end
   end
 

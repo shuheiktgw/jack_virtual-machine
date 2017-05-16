@@ -27,7 +27,7 @@ class JackVirtualMachine
   end
 
   def translator
-    Translator::VmTranslator.new(file_path)
+    @translator ||= Translator::VmTranslator.new
   end
 
   def dispatcher
@@ -35,6 +35,6 @@ class JackVirtualMachine
   end
 
   def loader
-    VmLoader.new(file_path, dispatcher)
+    VmLoader.new(file_path, dispatcher, translator)
   end
 end
