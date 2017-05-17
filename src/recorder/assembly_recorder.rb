@@ -20,7 +20,7 @@ module Recorder
 
     def asm_path
       if directory?
-        dir_name = file_path.match(/\/([\w\d_-]+)$/)[1]
+        dir_name = file_path.match(/\/?([\w\d_-]+)$/)[1]
         file_path + "/#{dir_name}.asm"
       elsif file?
         path = file_path.gsub(/\.vm$/, '.asm')
