@@ -21,13 +21,13 @@ class JackVirtualMachine
 
   private
 
-  def recorder
-    # Prevent deleting asm file when calling asm_file_path
-    @recorder ||= Recorder::AssemblyRecorder.new(file_path)
-  end
-
   def translator
     @translator ||= Translator::VmTranslator.new
+  end
+
+  def recorder
+    # Prevent deleting asm file when calling asm_file_path
+    @recorder ||= Recorder::AssemblyRecorder.new(file_path, translator)
   end
 
   def dispatcher
